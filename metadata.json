@@ -1,0 +1,6 @@
+{
+  "name": "AGRITECH - Smart Monitoring and Intelligent Farming",
+  "description": "Smart monitoring and intelligent farming platform with crop lifecycle tracking, real-time agro-meteorological advisories, deterministic rule-based reminders, and multi-plot ledger.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
