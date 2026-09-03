@@ -22,12 +22,14 @@ import {
   EyeOff,
   Trash2,
   Check,
-  AlertCircle
+  AlertCircle,
+  LogIn
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
   const { 
     user, 
+    isAuthenticated,
     updateUserProfile, 
     farms, 
     crops, 
@@ -136,13 +138,23 @@ export const ProfileView: React.FC = () => {
             <span>Switch Profile ({registeredAccounts.length})</span>
           </button>
 
-          <button
-            onClick={logout}
-            className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-bold border border-rose-200 transition cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-bold border border-rose-200 transition cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sign Out</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => openAuthModal('LOGIN')}
+              className="flex items-center gap-1.5 px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
+            >
+              <LogIn className="w-4 h-4 text-lime-400" />
+              <span>Sign In / Register</span>
+            </button>
+          )}
         </div>
       </div>
 

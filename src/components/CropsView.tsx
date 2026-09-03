@@ -19,7 +19,8 @@ import {
   TrendingUp,
   AlertCircle,
   Scissors,
-  QrCode
+  QrCode,
+  ShoppingBag
 } from 'lucide-react';
 
 export const CropsView: React.FC = () => {
@@ -112,6 +113,15 @@ export const CropsView: React.FC = () => {
             className="flex items-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-semibold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer"
           >
             <span>Crop Encyclopedia</span>
+          </button>
+
+          <button
+            id="sell-harvest-btn"
+            onClick={() => setActiveTab('sell-produce')}
+            className="flex items-center gap-1.5 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-800" />
+            <span>Sell Produce</span>
           </button>
           
           <button
@@ -297,10 +307,19 @@ export const CropsView: React.FC = () => {
 
                 <div className="flex items-center space-x-2">
                   <button
+                    onClick={() => setActiveTab('sell-produce')}
+                    className="text-xs font-bold text-emerald-900 bg-lime-100 hover:bg-lime-200 px-2.5 py-1.5 rounded-lg border border-lime-300 transition cursor-pointer flex items-center gap-1"
+                    title="Sell this crop produce in the Jharkhand Marketplace"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5 text-emerald-800" />
+                    <span>Sell Harvest</span>
+                  </button>
+
+                  <button
                     onClick={() => {
                       setSelectedCropDetail(crop);
                     }}
-                    className="text-emerald-800 hover:text-emerald-950 font-bold text-xs bg-lime-100 hover:bg-lime-200 px-2.5 py-1.5 rounded-lg border border-lime-300 transition cursor-pointer"
+                    className="text-stone-700 hover:text-emerald-950 font-semibold text-xs bg-stone-100 hover:bg-stone-200 px-2.5 py-1.5 rounded-lg border border-stone-200 transition cursor-pointer"
                   >
                     Details & Log
                   </button>

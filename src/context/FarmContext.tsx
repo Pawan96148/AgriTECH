@@ -12,7 +12,14 @@ import {
   CropStatus,
   SoilType,
   UserRole,
-  AuthMode
+  AuthMode,
+  ProductListing,
+  Order,
+  CartItem,
+  DeliveryStatus,
+  OrderAddress,
+  OrderItem,
+  OrderReview
 } from '../types';
 import {
   INITIAL_USER,
@@ -21,7 +28,9 @@ import {
   INITIAL_CROPS,
   INITIAL_ACTIVITIES,
   INITIAL_WEATHER,
-  INITIAL_EXPENSES
+  INITIAL_EXPENSES,
+  INITIAL_PRODUCTS,
+  INITIAL_ORDERS
 } from '../data/mockData';
 import { evaluateDeterministicRules } from '../utils/ruleEngine';
 import confetti from 'canvas-confetti';
@@ -94,6 +103,52 @@ interface FarmContextType {
   setIsExportModalOpen: (open: boolean) => void;
   preselectedCropForModal?: string;
   setPreselectedCropForModal: (name: string | undefined) => void;
+
+  // Marketplace & Farmer Harvests
+  products: ProductListing[];
+  addProductListing: (data: Omit<ProductListing, 'id' | 'createdAt' | 'rating' | 'reviewCount'>) => void;
+  updateProductListing: (id: string, data: Partial<ProductListing>) => void;
+  deleteProductListing: (id: string) => void;
+  toggleStockStatus: (id: string) => void;
+  editingProduct: ProductListing | null;
+  setEditingProduct: (prod: ProductListing | null) => void;
+
+  // Cart
+  cart: CartItem[];
+  cartCount: number;
+  cartTotal: number;
+  addToCart: (product: ProductListing, quantity?: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateCartQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+
+  // Orders & Fulfillment
+  orders: Order[];
+  createOrder: (orderData: {
+    customerAddress: OrderAddress;
+    paymentMethod: 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
+    items: OrderItem[];
+  }) => Promise<Order>;
+  updateOrderStatus: (orderId: string, status: DeliveryStatus, note?: string) => void;
+  cancelOrder: (orderId: string, reason?: string) => void;
+
+  // Customer Feedback & Farmer Replies
+  addOrderReview: (orderId: string, review: Omit<OrderReview, 'id' | 'createdAt'>) => void;
+  replyToOrderReview: (orderId: string, replyText: string) => void;
+
+  // Modals
+  isCheckoutModalOpen: boolean;
+  setIsCheckoutModalOpen: (open: boolean) => void;
+  checkoutDirectProduct: ProductListing | null;
+  setCheckoutDirectProduct: (prod: ProductListing | null) => void;
+  trackingOrderId: string | null;
+  setTrackingOrderId: (id: string | null) => void;
+  feedbackOrderId: string | null;
+  setFeedbackOrderId: (id: string | null) => void;
+  isPostHarvestModalOpen: boolean;
+  setIsPostHarvestModalOpen: (open: boolean) => void;
 }
 
 const FarmContext = createContext<FarmContextType | undefined>(undefined);
@@ -108,7 +163,15 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [registeredAccounts, setRegisteredAccounts] = useState<User[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}registered_accounts`);
-    return saved ? JSON.parse(saved) : DEFAULT_REGISTERED_ACCOUNTS;
+    if (!saved) return DEFAULT_REGISTERED_ACCOUNTS;
+    try {
+      const parsed: User[] = JSON.parse(saved);
+      const existingIds = new Set(parsed.map(u => u.id));
+      const missingDefaults = DEFAULT_REGISTERED_ACCOUNTS.filter(d => !existingIds.has(d.id));
+      return missingDefaults.length > 0 ? [...parsed, ...missingDefaults] : parsed;
+    } catch {
+      return DEFAULT_REGISTERED_ACCOUNTS;
+    }
   });
 
   const [user, setUser] = useState<User>(() => {
@@ -158,6 +221,32 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Products / Harvest Listings State
+  const [products, setProducts] = useState<ProductListing[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}products`);
+    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
+
+  // Orders State
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}orders`);
+    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+  });
+
+  // Shopping Cart State
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}cart`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [checkoutDirectProduct, setCheckoutDirectProduct] = useState<ProductListing | null>(null);
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
+  const [feedbackOrderId, setFeedbackOrderId] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductListing | null>(null);
+  const [isPostHarvestModalOpen, setIsPostHarvestModalOpen] = useState(false);
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Modals state
@@ -204,6 +293,18 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}read_reminders`, JSON.stringify(readReminderIds));
   }, [readReminderIds]);
 
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}products`, JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}orders`, JSON.stringify(orders));
+  }, [orders]);
+
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}cart`, JSON.stringify(cart));
+  }, [cart]);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -223,9 +324,15 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Authentication Handlers
   const login = async (emailOrPhone: string, password?: string): Promise<{ success: boolean; error?: string }> => {
     const cleanInput = emailOrPhone.trim().toLowerCase();
-    const foundUser = registeredAccounts.find(
-      u => u.email.toLowerCase() === cleanInput || u.phone.replace(/[\s+-]/g, '').includes(cleanInput.replace(/[\s+-]/g, ''))
-    );
+    const cleanDigits = cleanInput.replace(/\D/g, '');
+    const foundUser = registeredAccounts.find(u => {
+      if (u.email.toLowerCase() === cleanInput) return true;
+      if (cleanDigits.length >= 6) {
+        const uDigits = u.phone.replace(/\D/g, '');
+        return uDigits.endsWith(cleanDigits) || uDigits === cleanDigits;
+      }
+      return false;
+    });
 
     if (!foundUser) {
       return { success: false, error: 'No account found matching this email or phone. Please sign up.' };
@@ -244,7 +351,14 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsAuthenticated(true);
     setRegisteredAccounts(prev => prev.map(u => (u.id === updatedUser.id ? updatedUser : u)));
     setIsAuthModalOpen(false);
-    setActiveTab('dashboard');
+
+    if (updatedUser.role === 'CUSTOMER') {
+      setActiveTab('marketplace');
+    } else if (updatedUser.role === 'DEALER') {
+      setActiveTab('orders');
+    } else {
+      setActiveTab('dashboard');
+    }
 
     try {
       confetti({
@@ -282,11 +396,23 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       AGRONOMIST: 'Senior Agronomist & Crop Consultant',
       FIELD_MANAGER: 'Field Operations & Machinery Manager',
       RESEARCHER: 'Agricultural Scientist / Researcher',
-      TENANT_FARMER: 'Cultivator & Tenant Producer'
+      TENANT_FARMER: 'Cultivator & Tenant Producer',
+      CUSTOMER: 'Direct Agro Consumer & Buyer',
+      DEALER: 'Authorized Input & Equipment Dealer'
     };
 
     const assignedRole = data.role || 'FARM_OWNER';
     const assignedRoleTitle = data.roleTitle || roleNameMap[assignedRole];
+
+    const getRoleAvatarBg = (r: UserRole) => {
+      switch (r) {
+        case 'CUSTOMER': return 'bg-lime-700';
+        case 'DEALER': return 'bg-amber-800';
+        case 'AGRONOMIST': return 'bg-teal-700';
+        case 'FIELD_MANAGER': return 'bg-amber-700';
+        default: return 'bg-emerald-700';
+      }
+    };
 
     const newUser: User = {
       id: `usr_${Date.now()}`,
@@ -296,11 +422,11 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       password: data.password || 'Password@123',
       role: assignedRole,
       roleTitle: assignedRoleTitle,
-      region: data.region || 'Indore, Madhya Pradesh / Northern Plains',
+      region: data.region || 'Ranchi, Jharkhand',
       preferredLanguage: 'English',
-      avatarBg: assignedRole === 'AGRONOMIST' ? 'bg-teal-700' : assignedRole === 'FIELD_MANAGER' ? 'bg-amber-700' : 'bg-emerald-700',
-      farmSizeAcre: data.farmSizeAcre || 10.0,
-      primaryCropInterest: 'Wheat, Soybean, Pulses',
+      avatarBg: getRoleAvatarBg(assignedRole),
+      farmSizeAcre: data.farmSizeAcre || 5.0,
+      primaryCropInterest: assignedRole === 'CUSTOMER' ? 'Fresh Vegetables & Produce' : 'Wheat, Tomato, Pulses',
       lastLoginAt: new Date().toLocaleString(),
       isEmailVerified: true,
       createdAt: new Date().toISOString().split('T')[0]
@@ -342,8 +468,16 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(updatedUser);
       setIsAuthenticated(true);
       setIsAuthModalOpen(false);
-      setActiveTab('dashboard');
-      showToast(`Switched account to ${demo.name} (${demo.roleTitle || 'Farmer'}).`);
+
+      if (updatedUser.role === 'CUSTOMER') {
+        setActiveTab('marketplace');
+      } else if (updatedUser.role === 'DEALER') {
+        setActiveTab('orders');
+      } else {
+        setActiveTab('dashboard');
+      }
+
+      showToast(`Signed in as ${updatedUser.name} (${updatedUser.roleTitle || 'Cultivator'}).`);
     }
   };
 
@@ -353,8 +487,16 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(target);
       setIsAuthenticated(true);
       setIsAuthModalOpen(false);
-      setActiveTab('dashboard');
-      showToast(`Switched active profile to ${target.name}.`);
+
+      if (target.role === 'CUSTOMER') {
+        setActiveTab('marketplace');
+      } else if (target.role === 'DEALER') {
+        setActiveTab('orders');
+      } else {
+        setActiveTab('dashboard');
+      }
+
+      showToast(`Switched active profile to ${target.name} (${target.roleTitle || 'Cultivator'}).`);
     }
   };
 
@@ -620,6 +762,361 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     showToast('Profile information saved.');
   };
 
+  // Cart Calculations
+  const cartCount = useMemo(() => {
+    return cart.reduce((acc, item) => acc + item.quantity, 0);
+  }, [cart]);
+
+  const cartTotal = useMemo(() => {
+    return cart.reduce((acc, item) => acc + item.product.pricePerUnit * item.quantity, 0);
+  }, [cart]);
+
+  // Product / Harvest Listing Handlers
+  const addProductListing = (data: Omit<ProductListing, 'id' | 'createdAt' | 'rating' | 'reviewCount'>) => {
+    const newProd: ProductListing = {
+      ...data,
+      id: `prod_jh_${Date.now()}`,
+      rating: 5.0,
+      reviewCount: 0,
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    setProducts(prev => [newProd, ...prev]);
+    showToast(`Harvest listing "${newProd.cropName}" posted to Jharkhand Marketplace.`);
+    try {
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+    } catch {
+      // benign
+    }
+  };
+
+  const updateProductListing = (id: string, data: Partial<ProductListing>) => {
+    setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...data } : p)));
+    showToast('Produce listing updated.');
+  };
+
+  const deleteProductListing = (id: string) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+    setCart(prev => prev.filter(c => c.product.id !== id));
+    showToast('Produce listing removed from marketplace.');
+  };
+
+  const toggleStockStatus = (id: string) => {
+    setProducts(prev =>
+      prev.map(p => {
+        if (p.id === id) {
+          const newStatus = p.stockStatus === 'OUT_OF_STOCK' ? 'IN_STOCK' : 'OUT_OF_STOCK';
+          return { ...p, stockStatus: newStatus };
+        }
+        return p;
+      })
+    );
+    showToast('Stock availability updated.');
+  };
+
+  // Shopping Cart Handlers
+  const addToCart = (product: ProductListing, quantity: number = 1) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id);
+      if (existing) {
+        return prev.map(item =>
+          item.product.id === product.id
+            ? { ...item, quantity: Math.min(item.quantity + quantity, product.availableQuantity) }
+            : item
+        );
+      }
+      return [...prev, { product, quantity: Math.min(quantity, product.availableQuantity) }];
+    });
+    showToast(`Added ${quantity} ${product.unit} of ${product.cropName} to Cart.`);
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart(prev => prev.filter(item => item.product.id !== productId));
+    showToast('Item removed from cart.');
+  };
+
+  const updateCartQuantity = (productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+    } else {
+      setCart(prev =>
+        prev.map(item =>
+          item.product.id === productId ? { ...item, quantity } : item
+        )
+      );
+    }
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  // Order Handlers
+  const createOrder = async (orderData: {
+    customerAddress: OrderAddress;
+    paymentMethod: 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
+    items: OrderItem[];
+  }): Promise<Order> => {
+    const subtotal = orderData.items.reduce((acc, it) => acc + it.subtotal, 0);
+    const deliveryFee = 40;
+    const totalAmount = subtotal + deliveryFee;
+
+    const primaryFarmerId = orderData.items[0]?.farmerId || user.id;
+    const primaryFarmerName = orderData.items[0]?.farmerName || 'Jharkhand Cultivator';
+    const primaryFarmerLocation = orderData.items[0]?.farmerLocation || 'Ranchi';
+
+    const now = new Date();
+    const formattedNow = `${now.toISOString().split('T')[0]} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    const estDate = new Date();
+    estDate.setDate(estDate.getDate() + 2);
+    const estDateStr = estDate.toISOString().split('T')[0];
+
+    const orderId = `ORD-JH-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const newOrder: Order = {
+      id: orderId,
+      customerId: user.id,
+      customerName: orderData.customerAddress.fullName || user.name,
+      customerPhone: orderData.customerAddress.phone || user.phone,
+      deliveryAddress: orderData.customerAddress,
+      farmerId: primaryFarmerId,
+      farmerName: primaryFarmerName,
+      farmerPhone: '+91 94311 55678',
+      farmerLocation: primaryFarmerLocation,
+      items: orderData.items,
+      subtotal,
+      deliveryFee,
+      totalAmount,
+      paymentMethod: orderData.paymentMethod,
+      paymentStatus: orderData.paymentMethod === 'COD' ? 'PENDING' : 'PAID',
+      paymentId: orderData.paymentMethod === 'COD' ? undefined : `PAY-MOCK-${Math.floor(100000 + Math.random() * 900000)}`,
+      deliveryStatus: 'ORDER_PLACED',
+      timeline: [
+        {
+          status: 'ORDER_PLACED',
+          label: 'Order Placed',
+          timestamp: formattedNow,
+          location: `${orderData.customerAddress.district}, Jharkhand`,
+          note: `Customer direct order confirmed via ${orderData.paymentMethod}`,
+          completed: true
+        },
+        {
+          status: 'FARMER_ACCEPTED',
+          label: 'Farmer Accepted',
+          timestamp: 'Pending',
+          location: `${primaryFarmerLocation}, Jharkhand`,
+          note: 'Farmer confirmation of harvest & dispatch readiness',
+          completed: false
+        },
+        {
+          status: 'PACKED',
+          label: 'Packed at Farm',
+          timestamp: 'Pending',
+          location: `${primaryFarmerLocation}, Jharkhand`,
+          note: 'Produce sanitized, weighed & eco-packed',
+          completed: false
+        },
+        {
+          status: 'PICKED_UP',
+          label: 'Picked Up',
+          timestamp: 'Pending',
+          location: 'Regional Farm Hub Dispatch',
+          note: 'AgriTech logistics collection from farm gate',
+          completed: false
+        },
+        {
+          status: 'IN_TRANSIT',
+          label: 'In Transit',
+          timestamp: 'Pending',
+          location: 'Jharkhand Cold-Line Route',
+          note: 'In transit to customer delivery district',
+          completed: false
+        },
+        {
+          status: 'OUT_FOR_DELIVERY',
+          label: 'Out for Delivery',
+          timestamp: 'Pending',
+          location: `${orderData.customerAddress.district} Hub`,
+          note: 'Courier vehicle dispatched to destination',
+          completed: false
+        },
+        {
+          status: 'DELIVERED',
+          label: 'Delivered',
+          timestamp: 'Pending',
+          location: `${orderData.customerAddress.street}, ${orderData.customerAddress.district}`,
+          note: 'Fresh doorstep handover to customer',
+          completed: false
+        }
+      ],
+      estimatedDeliveryDate: estDateStr,
+      createdAt: formattedNow,
+      updatedAt: formattedNow
+    };
+
+    // Deduct stock from products
+    setProducts(prevProds =>
+      prevProds.map(prod => {
+        const matchingItem = orderData.items.find(it => it.productId === prod.id);
+        if (matchingItem) {
+          const newQty = Math.max(0, prod.availableQuantity - matchingItem.quantity);
+          return {
+            ...prod,
+            availableQuantity: newQty,
+            stockStatus: newQty === 0 ? 'OUT_OF_STOCK' : newQty < 20 ? 'LOW_STOCK' : 'IN_STOCK'
+          };
+        }
+        return prod;
+      })
+    );
+
+    setOrders(prev => [newOrder, ...prev]);
+    clearCart();
+    setCheckoutDirectProduct(null);
+    setIsCheckoutModalOpen(false);
+
+    try {
+      confetti({
+        particleCount: 100,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    } catch {
+      // benign
+    }
+
+    showToast(`Order #${newOrder.id} confirmed! Direct fresh dispatch from ${primaryFarmerName}.`);
+    return newOrder;
+  };
+
+  const updateOrderStatus = (orderId: string, status: DeliveryStatus, note?: string) => {
+    const now = new Date();
+    const formattedNow = `${now.toISOString().split('T')[0]} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id !== orderId) return ord;
+
+        const milestonesOrder: DeliveryStatus[] = [
+          'ORDER_PLACED',
+          'FARMER_ACCEPTED',
+          'PACKED',
+          'PICKED_UP',
+          'IN_TRANSIT',
+          'OUT_FOR_DELIVERY',
+          'DELIVERED'
+        ];
+        const targetIdx = milestonesOrder.indexOf(status);
+
+        const updatedTimeline = ord.timeline.map((m, idx) => {
+          if (m.status === status) {
+            return {
+              ...m,
+              completed: true,
+              timestamp: formattedNow,
+              note: note || m.note
+            };
+          }
+          if (idx <= targetIdx) {
+            return {
+              ...m,
+              completed: true,
+              timestamp: m.timestamp === 'Pending' ? formattedNow : m.timestamp
+            };
+          }
+          return m;
+        });
+
+        const isDelivered = status === 'DELIVERED';
+        return {
+          ...ord,
+          deliveryStatus: status,
+          timeline: updatedTimeline,
+          paymentStatus: isDelivered && ord.paymentMethod === 'COD' ? 'PAID' : ord.paymentStatus,
+          updatedAt: formattedNow
+        };
+      })
+    );
+
+    if (status === 'DELIVERED') {
+      try {
+        confetti({ particleCount: 70, spread: 80, origin: { y: 0.7 } });
+      } catch {
+        // benign
+      }
+    }
+
+    showToast(`Order #${orderId} milestone updated: ${status.replace(/_/g, ' ')}`);
+  };
+
+  const cancelOrder = (orderId: string, reason?: string) => {
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id !== orderId) return ord;
+        return {
+          ...ord,
+          deliveryStatus: 'CANCELLED',
+          updatedAt: new Date().toLocaleString()
+        };
+      })
+    );
+    showToast(`Order #${orderId} has been cancelled.`);
+  };
+
+  // Feedback Handlers
+  const addOrderReview = (orderId: string, reviewData: Omit<OrderReview, 'id' | 'createdAt'>) => {
+    const newRev: OrderReview = {
+      ...reviewData,
+      id: `rev_${Date.now()}`,
+      createdAt: new Date().toLocaleString()
+    };
+
+    setOrders(prev =>
+      prev.map(ord => (ord.id === orderId ? { ...ord, review: newRev } : ord))
+    );
+
+    // Update product rating and review count
+    setProducts(prev =>
+      prev.map(prod => {
+        if (prod.id === reviewData.productId) {
+          const newCount = prod.reviewCount + 1;
+          const newRating = Number(((prod.rating * prod.reviewCount + reviewData.rating) / newCount).toFixed(1));
+          return { ...prod, rating: newRating, reviewCount: newCount };
+        }
+        return prod;
+      })
+    );
+
+    setFeedbackOrderId(null);
+    try {
+      confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    } catch {
+      // benign
+    }
+    showToast('Review & rating submitted! Thank you for supporting Jharkhand cultivators.');
+  };
+
+  const replyToOrderReview = (orderId: string, replyText: string) => {
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id === orderId && ord.review) {
+          return {
+            ...ord,
+            review: {
+              ...ord.review,
+              farmerReply: {
+                text: replyText,
+                repliedAt: new Date().toLocaleString(),
+                farmerName: user.name
+              }
+            }
+          };
+        }
+        return ord;
+      })
+    );
+    showToast('Reply posted to customer feedback.');
+  };
+
   const resetToSampleData = () => {
     setUser(INITIAL_USER);
     setRegisteredAccounts(DEFAULT_REGISTERED_ACCOUNTS);
@@ -631,6 +1128,9 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setWeather(INITIAL_WEATHER);
     setExpenses(INITIAL_EXPENSES);
     setReadReminderIds([]);
+    setProducts(INITIAL_PRODUCTS);
+    setOrders(INITIAL_ORDERS);
+    setCart([]);
     showToast('App data reset to default demo dataset.');
   };
 
@@ -694,7 +1194,44 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isExportModalOpen,
         setIsExportModalOpen,
         preselectedCropForModal,
-        setPreselectedCropForModal
+        setPreselectedCropForModal,
+        // Marketplace & Farmer Harvests
+        products,
+        addProductListing,
+        updateProductListing,
+        deleteProductListing,
+        toggleStockStatus,
+        editingProduct,
+        setEditingProduct,
+        // Cart
+        cart,
+        cartCount,
+        cartTotal,
+        addToCart,
+        removeFromCart,
+        updateCartQuantity,
+        clearCart,
+        isCartOpen,
+        setIsCartOpen,
+        // Orders & Fulfillment
+        orders,
+        createOrder,
+        updateOrderStatus,
+        cancelOrder,
+        // Feedback & Replies
+        addOrderReview,
+        replyToOrderReview,
+        // Modals
+        isCheckoutModalOpen,
+        setIsCheckoutModalOpen,
+        checkoutDirectProduct,
+        setCheckoutDirectProduct,
+        trackingOrderId,
+        setTrackingOrderId,
+        feedbackOrderId,
+        setFeedbackOrderId,
+        isPostHarvestModalOpen,
+        setIsPostHarvestModalOpen
       }}
     >
       {children}

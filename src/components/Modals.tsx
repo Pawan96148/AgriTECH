@@ -217,8 +217,8 @@ export const Modals: React.FC = () => {
     <>
       {/* -------------------- ADD FARM MODAL -------------------- */}
       {isAddFarmModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-lime-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-emerald-800" />
@@ -359,8 +359,8 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- ADD CROP MODAL -------------------- */}
       {isAddCropModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-lime-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
                 <Wheat className="w-5 h-5 text-emerald-800" />
@@ -514,8 +514,8 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- ADD ACTIVITY MODAL -------------------- */}
       {isAddActivityModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-lime-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
                 <CalendarCheck className="w-5 h-5 text-emerald-800" />
@@ -686,8 +686,8 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- EXPORT SUMMARY REPORT MODAL -------------------- */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-5 shadow-2xl border border-lime-200 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 space-y-5 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-200 pb-3">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-800" />

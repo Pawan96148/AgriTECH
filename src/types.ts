@@ -15,7 +15,9 @@ export type UserRole =
   | 'AGRONOMIST' 
   | 'FIELD_MANAGER' 
   | 'RESEARCHER' 
-  | 'TENANT_FARMER';
+  | 'TENANT_FARMER'
+  | 'CUSTOMER'
+  | 'DEALER';
 
 export interface User {
   id: string;
@@ -254,4 +256,136 @@ export type ActiveTab =
   | 'reminders' 
   | 'knowledge' 
   | 'expenses' 
-  | 'profile';
+  | 'profile'
+  | 'marketplace'
+  | 'orders'
+  | 'sell-produce';
+
+export type ProductUnit = 'kg' | 'quintal' | 'ton' | 'crate' | 'bag';
+
+export type QualityGrade = 
+  | 'Grade A (Premium)' 
+  | 'Grade B (Standard)' 
+  | 'Organic Certified' 
+  | 'Export Quality';
+
+export type StockStatus = 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+
+export interface ProductListing {
+  id: string;
+  farmerId: string;
+  farmerName: string;
+  farmerPhone: string;
+  cropName: string;
+  variety?: string;
+  category: 'Vegetable' | 'Grain & Cereal' | 'Fruit' | 'Pulse' | 'Cash Crop' | 'Spices';
+  imageUrl: string;
+  availableQuantity: number;
+  unit: ProductUnit;
+  pricePerUnit: number; // in INR (₹)
+  harvestDate: string; // YYYY-MM-DD
+  expectedAvailabilityDate: string; // YYYY-MM-DD
+  location: string; // Jharkhand District (e.g. "Ranchi", "Hazaribagh", etc.)
+  farmName?: string;
+  description: string;
+  qualityGrade: QualityGrade;
+  stockStatus: StockStatus;
+  rating: number; // 0 - 5
+  reviewCount: number;
+  createdAt: string;
+}
+
+export type DeliveryStatus = 
+  | 'ORDER_PLACED' 
+  | 'FARMER_ACCEPTED' 
+  | 'PACKED' 
+  | 'PICKED_UP' 
+  | 'IN_TRANSIT' 
+  | 'OUT_FOR_DELIVERY' 
+  | 'DELIVERED' 
+  | 'CANCELLED';
+
+export interface DeliveryMilestone {
+  status: DeliveryStatus;
+  label: string;
+  timestamp: string;
+  location?: string;
+  note?: string;
+  completed: boolean;
+}
+
+export interface OrderAddress {
+  fullName: string;
+  phone: string;
+  street: string;
+  district: string; // Jharkhand district
+  state: 'Jharkhand';
+  pincode: string;
+  landmark?: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  cropName: string;
+  variety?: string;
+  imageUrl: string;
+  quantity: number;
+  unit: ProductUnit;
+  pricePerUnit: number;
+  subtotal: number;
+  farmerId: string;
+  farmerName: string;
+  farmerLocation: string;
+}
+
+export interface FarmerReply {
+  text: string;
+  repliedAt: string;
+  farmerName: string;
+}
+
+export interface OrderReview {
+  id: string;
+  orderId: string;
+  productId: string;
+  customerId: string;
+  customerName: string;
+  rating: number; // 1 - 5
+  reviewText: string;
+  productQuality: 'Excellent' | 'Good' | 'Fair' | 'Poor';
+  deliveryExperience: 'Fast & Fresh' | 'Standard' | 'Delayed';
+  imageUrl?: string;
+  createdAt: string;
+  farmerReply?: FarmerReply;
+}
+
+export interface Order {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: OrderAddress;
+  farmerId: string;
+  farmerName: string;
+  farmerPhone: string;
+  farmerLocation: string;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  totalAmount: number;
+  paymentMethod: 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
+  paymentStatus: 'PAID' | 'PENDING' | 'REFUNDED';
+  paymentId?: string;
+  deliveryStatus: DeliveryStatus;
+  timeline: DeliveryMilestone[];
+  estimatedDeliveryDate: string;
+  createdAt: string;
+  updatedAt: string;
+  review?: OrderReview;
+}
+
+export interface CartItem {
+  product: ProductListing;
+  quantity: number;
+}
+

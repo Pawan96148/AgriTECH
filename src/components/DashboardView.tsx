@@ -24,7 +24,9 @@ import {
   Check,
   Calendar,
   Layers,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Store,
+  ShoppingBag
 } from 'lucide-react';
 
 export const DashboardView: React.FC = () => {
@@ -46,7 +48,9 @@ export const DashboardView: React.FC = () => {
     setIsAddCropModalOpen,
     setIsAddFarmModalOpen,
     setIsExportModalOpen,
-    user
+    user,
+    products,
+    orders
   } = useFarm();
 
   const [activeWeatherSim, setActiveWeatherSim] = useState<'rainy' | 'sunny' | 'heatwave' | 'windy'>('rainy');
@@ -152,11 +156,11 @@ export const DashboardView: React.FC = () => {
             </div>
 
             {/* Weather Simulator Quick Switcher Pill for Demo */}
-            <div className="pt-1 flex items-center justify-between text-[11px] text-emerald-200">
+            <div className="pt-1 flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-emerald-200">
               <span className="font-medium text-lime-300 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" /> Test Scenario:
               </span>
-              <div className="flex items-center space-x-1">
+              <div className="flex flex-wrap items-center gap-1">
                 {(['rainy', 'sunny', 'heatwave', 'windy'] as const).map((s) => (
                   <button
                     key={s}
@@ -178,21 +182,21 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* Metrics Ribbon (PRD Section 14) */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4">
         {/* Metric 1: Active Farms */}
         <div 
           onClick={() => setActiveTab('farms')}
-          className="bg-white p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
+          className="bg-white p-3 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-500 mb-1">
-            <span className="text-xs font-semibold text-emerald-900/80">Active Plots</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-900/80">Active Plots</span>
             <MapPin className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-emerald-950">{farms.length}</span>
-            <span className="text-xs text-stone-500 font-medium">Parcels</span>
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-extrabold text-emerald-950">{farms.length}</span>
+            <span className="text-[11px] sm:text-xs text-stone-500 font-medium">Parcels</span>
           </div>
-          <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+          <span className="text-[10px] sm:text-[11px] text-emerald-700 font-medium mt-1 block truncate">
             {farms[0]?.soilType} & {farms[1]?.soilType || 'Mixed'} soils
           </span>
         </div>
@@ -200,17 +204,17 @@ export const DashboardView: React.FC = () => {
         {/* Metric 2: Total Land Area */}
         <div 
           onClick={() => setActiveTab('farms')}
-          className="bg-white p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
+          className="bg-white p-3 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-500 mb-1">
-            <span className="text-xs font-semibold text-emerald-900/80">Total Area</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-900/80">Total Area</span>
             <Layers className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-emerald-950">{totalAcreage.toFixed(1)}</span>
-            <span className="text-xs text-stone-500 font-medium">Acres</span>
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-extrabold text-emerald-950">{totalAcreage.toFixed(1)}</span>
+            <span className="text-[11px] sm:text-xs text-stone-500 font-medium">Acres</span>
           </div>
-          <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+          <span className="text-[10px] sm:text-[11px] text-emerald-700 font-medium mt-1 block truncate">
             {(totalAcreage * 0.4046).toFixed(1)} Hectares
           </span>
         </div>
@@ -218,17 +222,17 @@ export const DashboardView: React.FC = () => {
         {/* Metric 3: Growing Crops */}
         <div 
           onClick={() => setActiveTab('crops')}
-          className="bg-white p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
+          className="bg-white p-3 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-500 mb-1">
-            <span className="text-xs font-semibold text-emerald-900/80">Growing Crops</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-900/80">Growing Crops</span>
             <Wheat className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-emerald-950">{activeCrops.length}</span>
-            <span className="text-xs text-emerald-700 font-semibold bg-lime-100 px-1.5 py-0.2 rounded">Active</span>
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-extrabold text-emerald-950">{activeCrops.length}</span>
+            <span className="text-[10px] sm:text-xs text-emerald-700 font-semibold bg-lime-100 px-1.5 py-0.2 rounded">Active</span>
           </div>
-          <span className="text-[11px] text-stone-500 font-medium mt-1 block">
+          <span className="text-[10px] sm:text-[11px] text-stone-500 font-medium mt-1 block truncate">
             {crops.filter(c => c.status === 'COMPLETED').length} harvested
           </span>
         </div>
@@ -236,23 +240,23 @@ export const DashboardView: React.FC = () => {
         {/* Metric 4: Tasks Due Today */}
         <div 
           onClick={() => setActiveTab('activities')}
-          className="bg-white p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
+          className="bg-white p-3 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-500 mb-1">
-            <span className="text-xs font-semibold text-emerald-900/80">Pending Tasks</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-900/80">Pending Tasks</span>
             <CalendarCheck className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-emerald-950">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-extrabold text-emerald-950">
               {dueTodayTasks.length + overdueTasks.length}
             </span>
             {overdueTasks.length > 0 && (
-              <span className="text-[10px] text-rose-700 font-bold bg-rose-100 px-1.5 py-0.5 rounded">
-                {overdueTasks.length} Overdue
+              <span className="text-[9px] sm:text-[10px] text-rose-700 font-bold bg-rose-100 px-1.5 py-0.5 rounded">
+                {overdueTasks.length} Late
               </span>
             )}
           </div>
-          <span className="text-[11px] text-stone-500 font-medium mt-1 block">
+          <span className="text-[10px] sm:text-[11px] text-stone-500 font-medium mt-1 block truncate">
             {dueTodayTasks.length} scheduled today
           </span>
         </div>
@@ -260,21 +264,65 @@ export const DashboardView: React.FC = () => {
         {/* Metric 5: Active Rule Advisories */}
         <div 
           onClick={() => setActiveTab('reminders')}
-          className="bg-white p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group col-span-2 sm:col-span-1"
+          className="bg-white p-3 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group col-span-2 sm:col-span-1"
         >
           <div className="flex items-center justify-between text-stone-500 mb-1">
-            <span className="text-xs font-semibold text-emerald-900/80">Active Alerts</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-900/80">Active Alerts</span>
             <ShieldAlert className="w-4 h-4 text-amber-600 group-hover:scale-110 transition" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-amber-700">{reminders.length}</span>
-            <span className="text-xs text-amber-700 font-bold bg-amber-100 px-1.5 py-0.5 rounded">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-xl sm:text-2xl font-extrabold text-amber-700">{reminders.length}</span>
+            <span className="text-[9px] sm:text-xs text-amber-700 font-bold bg-amber-100 px-1.5 py-0.5 rounded">
               {unreadRemindersCount} Unread
             </span>
           </div>
-          <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+          <span className="text-[10px] sm:text-[11px] text-emerald-700 font-medium mt-1 block truncate">
             Deterministic Engine
           </span>
+        </div>
+      </div>
+
+      {/* Jharkhand Produce & Direct Orders Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-green-950 text-white rounded-2xl p-4 sm:p-5 shadow-xs border border-lime-400/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-lime-400 text-emerald-950 flex items-center justify-center font-bold shrink-0">
+            <Store className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-sm text-white font-serif">Direct Cultivator Produce Channel</span>
+              <span className="bg-lime-400 text-emerald-950 text-[10px] font-extrabold px-2 py-0.2 rounded-full uppercase tracking-wider">
+                Jharkhand Scope
+              </span>
+            </div>
+            <p className="text-xs text-emerald-200 mt-0.5">
+              {products.length} live harvest listings in 24 districts • {orders.length} direct orders undergoing transparent farm-to-doorstep tracking
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 flex-wrap w-full md:w-auto">
+          <button
+            onClick={() => setActiveTab('sell-produce')}
+            className="flex-1 sm:flex-initial justify-center px-3.5 py-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold text-xs rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Post Harvest Listing</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('marketplace')}
+            className="flex-1 sm:flex-initial justify-center px-3.5 py-2 bg-emerald-900 hover:bg-emerald-800 text-lime-200 border border-emerald-600 font-bold text-xs rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <span>Fresh Marketplace</span>
+            <ArrowRight className="w-3.5 h-3.5 text-lime-400" />
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className="flex-1 sm:flex-initial justify-center px-3.5 py-2 bg-emerald-900 hover:bg-emerald-800 text-lime-200 border border-emerald-600 font-bold text-xs rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-lime-400" />
+            <span>Orders ({orders.length})</span>
+          </button>
         </div>
       </div>
 

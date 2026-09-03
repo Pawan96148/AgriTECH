@@ -25,20 +25,19 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-const INDIAN_STATES = [
-  'Indore / Malwa, Madhya Pradesh',
-  'Ludhiana / Northern Plains, Punjab',
-  'Pune / Western Ghats, Maharashtra',
-  'Nashik / Deccan Plateau, Maharashtra',
-  'Karnal / GT Road Belt, Haryana',
-  'Varanasi / Gangetic Basin, Uttar Pradesh',
-  'Ahmedabad / Saurashtra, Gujarat',
-  'Bengaluru / Southern Plateau, Karnataka',
-  'Jaipur / Thar Fringe, Rajasthan',
-  'Guntur / Coastal Corridor, Andhra Pradesh',
-  'Coimbatore / Cauvery Basin, Tamil Nadu',
-  'Burdwan / Rice Belt, West Bengal',
-  'Other / International Agricultural Zone'
+const JHARKHAND_REGIONS = [
+  'Ranchi, Jharkhand',
+  'Jamshedpur (East Singhbhum), Jharkhand',
+  'Dhanbad, Jharkhand',
+  'Bokaro, Jharkhand',
+  'Deoghar, Jharkhand',
+  'Hazaribagh, Jharkhand',
+  'Ramgarh, Jharkhand',
+  'Dumka, Jharkhand',
+  'Giridih, Jharkhand',
+  'Chaibasa (West Singhbhum), Jharkhand',
+  'Palamu, Jharkhand',
+  'Other State (Outside Jharkhand)'
 ];
 
 export const AuthModal: React.FC = () => {
@@ -73,7 +72,7 @@ export const AuthModal: React.FC = () => {
   const [signupPassword, setSignupPassword] = useState('');
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [signupRole, setSignupRole] = useState<UserRole>('FARM_OWNER');
-  const [signupRegion, setSignupRegion] = useState(INDIAN_STATES[0]);
+  const [signupRegion, setSignupRegion] = useState(JHARKHAND_REGIONS[0]);
   const [signupFarmSize, setSignupFarmSize] = useState('10.0');
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [signupError, setSignupError] = useState<string | null>(null);
@@ -311,6 +310,15 @@ export const AuthModal: React.FC = () => {
                 </div>
               )}
 
+              {/* Demo Password Callout Banner */}
+              <div className="bg-lime-50/80 border border-lime-300 rounded-xl p-2.5 text-[11px] text-emerald-950 flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-emerald-900">Demo Password: </span>
+                  <code className="bg-white px-1.5 py-0.5 rounded border border-lime-300 font-mono font-bold text-emerald-950">Password@123</code>
+                </div>
+                <span className="text-[10px] text-stone-500">Universal demo password</span>
+              </div>
+
               <form onSubmit={handleLoginSubmit} className="space-y-3 text-xs">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">
@@ -324,7 +332,7 @@ export const AuthModal: React.FC = () => {
                       id="login-email-input"
                       type="text"
                       required
-                      placeholder="e.g. rajesh.farmer@agropulse.io or +91 98765 43210"
+                      placeholder="e.g. ramesh.farmer@jharkhandagro.in or +91 94311 55678"
                       value={loginIdentifier}
                       onChange={(e) => setLoginIdentifier(e.target.value)}
                       className="w-full pl-9 pr-3 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700 focus:border-emerald-700 transition"
@@ -400,38 +408,43 @@ export const AuthModal: React.FC = () => {
                     <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                     One-Click Quick Login (Demo Profiles):
                   </span>
-                  <span className="text-[10px] text-stone-400">Instant test accounts</span>
+                  <span className="text-[10px] text-stone-400">Instant role switching</span>
                 </div>
 
                 <div className="space-y-1.5">
-                  {registeredAccounts.slice(0, 3).map((acc) => (
+                  {registeredAccounts.slice(0, 4).map((acc) => (
                     <button
                       key={acc.id}
                       type="button"
                       onClick={() => loginAsDemoUser(acc.id)}
-                      className={`w-full p-2 rounded-xl border text-left flex items-center justify-between transition cursor-pointer ${
+                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition cursor-pointer ${
                         user.id === acc.id && isAuthenticated
-                          ? 'bg-lime-50 border-lime-300 text-emerald-950'
+                          ? 'bg-lime-50 border-lime-400 text-emerald-950 ring-1 ring-lime-400/50'
                           : 'bg-stone-50 hover:bg-lime-50/60 border-stone-200 hover:border-lime-300'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-7 h-7 rounded-lg ${acc.avatarBg || 'bg-emerald-700'} text-white font-bold text-xs flex items-center justify-center shrink-0`}>
+                        <div className={`w-8 h-8 rounded-lg ${acc.avatarBg || 'bg-emerald-700'} text-white font-bold text-xs flex items-center justify-center shrink-0`}>
                           {acc.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </div>
                         <div className="truncate">
-                          <div className="font-bold text-xs text-stone-900 truncate">{acc.name}</div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs text-stone-900 truncate">{acc.name}</span>
+                            <span className="bg-stone-200/80 text-stone-700 text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
+                              {acc.role === 'FARM_OWNER' ? 'Farmer' : acc.role}
+                            </span>
+                          </div>
                           <div className="text-[10px] text-stone-500 truncate">{acc.roleTitle || acc.region}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-800 shrink-0 ml-2">
                         {user.id === acc.id && isAuthenticated ? (
-                          <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                          <span className="bg-emerald-800 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
                             Active
                           </span>
                         ) : (
                           <>
-                            <span>Quick Sign In</span>
+                            <span>Sign In</span>
                             <ArrowRight className="w-3 h-3 text-emerald-600" />
                           </>
                         )}
@@ -525,7 +538,7 @@ export const AuthModal: React.FC = () => {
                 {/* Role Selector */}
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Your Primary Agricultural Role *</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => setSignupRole('FARM_OWNER')}
@@ -543,6 +556,36 @@ export const AuthModal: React.FC = () => {
 
                     <button
                       type="button"
+                      onClick={() => setSignupRole('CUSTOMER')}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        signupRole === 'CUSTOMER'
+                          ? 'bg-lime-50 border-lime-600 text-emerald-950 font-bold'
+                          : 'bg-stone-50 hover:bg-stone-100 border-stone-200 text-stone-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-bold">
+                        <span>🛒 Customer / Buyer</span>
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Direct farmer produce purchaser</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSignupRole('DEALER')}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        signupRole === 'DEALER'
+                          ? 'bg-amber-50 border-amber-600 text-emerald-950 font-bold'
+                          : 'bg-stone-50 hover:bg-stone-100 border-stone-200 text-stone-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-bold">
+                        <span>🏪 Inputs Dealer</span>
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Seeds, fertilizer & farm equipment</p>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setSignupRole('AGRONOMIST')}
                       className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                         signupRole === 'AGRONOMIST'
@@ -553,7 +596,7 @@ export const AuthModal: React.FC = () => {
                       <div className="flex items-center gap-1.5 text-xs font-bold">
                         <span>🧪 Agronomist</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Crop doctor & soil fertility consultant</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Crop doctor & soil consultant</p>
                     </button>
 
                     <button
@@ -568,7 +611,7 @@ export const AuthModal: React.FC = () => {
                       <div className="flex items-center gap-1.5 text-xs font-bold">
                         <span>🚜 Field Manager</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Machinery, labor & spray operations</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Machinery & operations manager</p>
                     </button>
 
                     <button
@@ -583,7 +626,7 @@ export const AuthModal: React.FC = () => {
                       <div className="flex items-center gap-1.5 text-xs font-bold">
                         <span>🔬 Researcher</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Agricultural trials & yield analytics</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Agricultural trials & analytics</p>
                     </button>
                   </div>
                 </div>
@@ -591,26 +634,33 @@ export const AuthModal: React.FC = () => {
                 {/* Region & Farm Size Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-stone-700 mb-1">State / Agricultural Region *</label>
+                    <label className="block font-semibold text-stone-700 mb-1">State / District (Jharkhand Scope) *</label>
                     <select
                       value={signupRegion}
                       onChange={(e) => setSignupRegion(e.target.value)}
                       className="w-full py-2 px-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700"
                     >
-                      {INDIAN_STATES.map((st) => (
+                      {JHARKHAND_REGIONS.map((st) => (
                         <option key={st} value={st}>
                           {st}
                         </option>
                       ))}
                     </select>
+                    {signupRegion.includes('Outside Jharkhand') && (
+                      <p className="mt-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-1.5">
+                        ⚠️ Currently available only within Jharkhand.
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block font-semibold text-stone-700 mb-1">Total Landholdings (Acres)</label>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      {signupRole === 'CUSTOMER' ? 'Delivery Pin Code' : 'Total Landholdings (Acres)'}
+                    </label>
                     <input
-                      type="number"
+                      type={signupRole === 'CUSTOMER' ? 'text' : 'number'}
                       step="0.5"
-                      placeholder="e.g. 12.5"
+                      placeholder={signupRole === 'CUSTOMER' ? 'e.g. 834001 (Ranchi)' : 'e.g. 12.5'}
                       value={signupFarmSize}
                       onChange={(e) => setSignupFarmSize(e.target.value)}
                       className="w-full py-2 px-3 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold font-mono text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700"

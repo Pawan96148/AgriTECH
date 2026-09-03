@@ -14,6 +14,12 @@ import { ProfileView } from './components/ProfileView';
 import { ProtectedAccessGate } from './components/ProtectedAccessGate';
 import { Modals } from './components/Modals';
 import { AuthModal } from './components/AuthModal';
+import { MarketplaceView } from './components/MarketplaceView';
+import { SellProduceView } from './components/SellProduceView';
+import { OrdersView } from './components/OrdersView';
+import { CheckoutModal } from './components/CheckoutModal';
+import { DeliveryTrackingModal } from './components/DeliveryTrackingModal';
+import { FeedbackModal } from './components/FeedbackModal';
 import { Sprout, CheckCircle2, Heart } from 'lucide-react';
 
 const MainContent: React.FC = () => {
@@ -90,6 +96,19 @@ const MainContent: React.FC = () => {
             description="Sign in to manage your cultivator credentials, security passwords, and registered device accounts."
           />
         );
+      case 'marketplace':
+        return <MarketplaceView />;
+      case 'orders':
+        return <OrdersView />;
+      case 'sell-produce':
+        return isAuthenticated ? (
+          <SellProduceView />
+        ) : (
+          <ProtectedAccessGate
+            viewName="Sell Produce & Harvest Listings"
+            description="Sign in to your cultivator account to post crop harvests, set pricing, and manage incoming consumer orders."
+          />
+        );
       default:
         return <LandingPage />;
     }
@@ -99,7 +118,7 @@ const MainContent: React.FC = () => {
     <div className="min-h-screen bg-[#F8FAF7] text-[#212529] flex flex-col font-sans selection:bg-lime-200 selection:text-emerald-950">
       {/* Toast Notification Popup */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 animate-bounce duration-300 bg-emerald-950 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-lime-400/50 flex items-center gap-2">
+        <div className="fixed bottom-20 md:bottom-5 right-4 left-4 sm:left-auto sm:right-5 z-50 animate-bounce duration-300 bg-emerald-950 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-lime-400/50 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-lime-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -109,13 +128,16 @@ const MainContent: React.FC = () => {
       <Navbar />
 
       {/* Main Tab Screen */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {renderActiveView()}
       </main>
 
       {/* Modals Provider */}
       <Modals />
       <AuthModal />
+      <CheckoutModal />
+      <DeliveryTrackingModal />
+      <FeedbackModal />
 
       {/* Universal AgriTech Footer */}
       <footer className="bg-emerald-950 text-emerald-100 border-t border-emerald-900 mt-12 py-10">
@@ -137,19 +159,20 @@ const MainContent: React.FC = () => {
               <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">Farm Management</h4>
               <ul className="space-y-1.5 text-xs text-emerald-200">
                 <li><button onClick={() => setActiveTab('dashboard')} className="hover:text-white transition">Farmer Dashboard</button></li>
+                <li><button onClick={() => setActiveTab('sell-produce')} className="hover:text-white transition">Sell Produce / Post Harvest</button></li>
+                <li><button onClick={() => setActiveTab('orders')} className="hover:text-white transition">Direct Orders & Fulfillment</button></li>
                 <li><button onClick={() => setActiveTab('farms')} className="hover:text-white transition">Registered Land Plots</button></li>
                 <li><button onClick={() => setActiveTab('crops')} className="hover:text-white transition">Crop Life-Cycles</button></li>
-                <li><button onClick={() => setActiveTab('activities')} className="hover:text-white transition">Field Scheduler</button></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">Intelligence & Feeds</h4>
+              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">Market & Intelligence</h4>
               <ul className="space-y-1.5 text-xs text-emerald-200">
+                <li><button onClick={() => setActiveTab('marketplace')} className="hover:text-white transition font-semibold text-lime-300">Jharkhand Fresh Marketplace</button></li>
                 <li><button onClick={() => setActiveTab('weather')} className="hover:text-white transition">Localized 5-Day Weather</button></li>
                 <li><button onClick={() => setActiveTab('reminders')} className="hover:text-white transition">Deterministic Rule Advisories</button></li>
                 <li><button onClick={() => setActiveTab('knowledge')} className="hover:text-white transition">Predefined Crop Encyclopedia</button></li>
-                <li><button onClick={() => setActiveTab('expenses')} className="hover:text-white transition">Input Costs & Ledger</button></li>
               </ul>
             </div>
 
