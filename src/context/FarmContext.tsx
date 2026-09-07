@@ -176,7 +176,19 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [user, setUser] = useState<User>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}user`);
-    return saved ? JSON.parse(saved) : INITIAL_USER;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.region?.includes('Indore') || parsed.region?.includes('Madhya Pradesh')) {
+          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}user`);
+          return INITIAL_USER;
+        }
+        return parsed;
+      } catch {
+        return INITIAL_USER;
+      }
+    }
+    return INITIAL_USER;
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -189,7 +201,22 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [farms, setFarms] = useState<Farm[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`);
-    return saved ? JSON.parse(saved) : INITIAL_FARMS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasLegacyIndore = Array.isArray(parsed) && parsed.some((f: Farm) =>
+          f.location?.includes('Indore') || f.location?.includes('Narmada') || f.location?.includes('Malwa')
+        );
+        if (hasLegacyIndore) {
+          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`);
+          return INITIAL_FARMS;
+        }
+        return parsed;
+      } catch {
+        return INITIAL_FARMS;
+      }
+    }
+    return INITIAL_FARMS;
   });
 
   const [selectedFarmId, setSelectedFarmId] = useState<string>(() => {
@@ -198,7 +225,22 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [crops, setCrops] = useState<Crop[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`);
-    return saved ? JSON.parse(saved) : INITIAL_CROPS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasLegacyCotton = Array.isArray(parsed) && parsed.some((c: Crop) =>
+          c.cropName?.toLowerCase().includes('cotton')
+        );
+        if (hasLegacyCotton) {
+          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`);
+          return INITIAL_CROPS;
+        }
+        return parsed;
+      } catch {
+        return INITIAL_CROPS;
+      }
+    }
+    return INITIAL_CROPS;
   });
 
   const [activities, setActivities] = useState<Activity[]>(() => {
@@ -208,8 +250,42 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [weather, setWeather] = useState<WeatherData>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`);
-    return saved ? JSON.parse(saved) : INITIAL_WEATHER;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.location?.includes('Indore') || parsed.location?.includes('Delhi') || parsed.location?.includes('M.P.')) {
+          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`);
+          return INITIAL_WEATHER;
+        }
+        return parsed;
+      } catch {
+        return INITIAL_WEATHER;
+      }
+    }
+    return INITIAL_WEATHER;
   });
+
+  useEffect(() => {
+    const fetchLiveWeather = async () => {
+      try {
+        const currentFarm = farms.find(f => f.id === selectedFarmId) || farms[0];
+        const cityCandidate = currentFarm?.location
+          ? currentFarm.location.split(/[,(]/)[0].replace(/District/i, '').trim()
+          : 'Ranchi';
+        const targetCity = cityCandidate || 'Ranchi';
+        const res = await fetch(`http://localhost:5000/api/weather?city=${encodeURIComponent(targetCity)}`);
+        if (!res.ok) throw new Error('Weather request failed');
+        const data = await res.json();
+        if (data?.success && data?.weather) {
+          setWeather(data.weather);
+        }
+      } catch {
+        setWeather(INITIAL_WEATHER);
+      }
+    };
+
+    fetchLiveWeather();
+  }, [selectedFarmId, farms]);
 
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}expenses`);

@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const produceRoutes = require('./routes/produceRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const farmRoutes = require('./routes/farmRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -63,6 +64,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', produceRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/farms', farmRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Optional: Serve frontend static build if present in dist
 const distPath = path.resolve(__dirname, '..', 'dist');

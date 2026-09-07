@@ -40,7 +40,7 @@ export const INITIAL_USER: User = {
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   avatarBg: 'bg-emerald-700',
   farmSizeAcre: 15.2,
-  primaryCropInterest: 'Soybean, Cotton, Wheat',
+  primaryCropInterest: 'Paddy (Rice), Tomato, Maize, Mustard',
   lastLoginAt: '2026-03-30 08:15 AM',
   isEmailVerified: true,
   createdAt: '2026-01-15'
@@ -151,40 +151,40 @@ export const INITIAL_FARMS: Farm[] = [
   {
     id: 'farm_01',
     userId: 'usr_farmer_01',
-    farmName: 'Green Valley Plot A',
-    location: 'Indore North Sector (M.P.)',
-    latitude: 22.7196,
-    longitude: 75.8577,
+    farmName: 'Ranchi Valley Plot A',
+    location: 'Ranchi District, Jharkhand',
+    latitude: 23.3441,
+    longitude: 85.3096,
     area: 8.5,
-    soilType: 'Black',
+    soilType: 'Red',
     irrigationType: 'Drip',
-    notes: 'Primary deep black cotton soil parcel with solar-powered drip filtration system.',
+    notes: 'Primary fertile red loam parcel with solar-powered drip filtration system in Ranchi.',
     createdAt: getRelativeDate(-120)
   },
   {
     id: 'farm_02',
     userId: 'usr_farmer_01',
-    farmName: 'Riverside Organic Acres',
-    location: 'Narmada Basin Sub-district',
-    latitude: 22.1852,
-    longitude: 75.9873,
+    farmName: 'Subarnarekha Organic Acres',
+    location: 'Ormanjhi, Ranchi (Jharkhand)',
+    latitude: 23.4833,
+    longitude: 85.4833,
     area: 4.2,
     soilType: 'Loamy',
     irrigationType: 'Sprinkler',
-    notes: 'Well-drained fertile alluvium loamy plot dedicated to horticulture and high-value vegetables.',
+    notes: 'Well-drained fertile alluvium loamy plot dedicated to horticulture and high-value vegetables near Subarnarekha basin.',
     createdAt: getRelativeDate(-90)
   },
   {
     id: 'farm_03',
     userId: 'usr_farmer_01',
-    farmName: 'Highland Terrace Plot',
-    location: 'Malwa Plateau Hilltop',
-    latitude: 22.8421,
-    longitude: 76.0125,
+    farmName: 'Chota Nagpur Terrace Plot',
+    location: 'Hazaribagh Plateau, Jharkhand',
+    latitude: 23.9925,
+    longitude: 85.3637,
     area: 2.5,
     soilType: 'Red',
     irrigationType: 'Borewell',
-    notes: 'Terraced slope with red loamy soil, good for pulses and drought-tolerant legumes.',
+    notes: 'Terraced slope with red loamy soil, good for pulses, maize, and drought-tolerant legumes.',
     createdAt: getRelativeDate(-60)
   }
 ];
@@ -221,15 +221,15 @@ export const INITIAL_CROPS: Crop[] = [
   {
     id: 'crop_03',
     farmId: 'farm_01',
-    cropName: 'Cotton (Bt Hybrid RCH-2)',
-    variety: 'Long Staple Bollgard II',
+    cropName: 'Paddy / Rice (Sahbhagi Dhan)',
+    variety: 'BAU Certified Drought-Tolerant',
     plantingDate: getRelativeDate(-50),
-    expectedHarvestDate: getRelativeDate(110),
+    expectedHarvestDate: getRelativeDate(70),
     stage: 'Vegetative',
     status: 'ACTIVE',
     estimatedYieldKg: 11000,
     healthScore: 95,
-    notes: 'Square formation started. Drip fertigation scheduled weekly.',
+    notes: 'Tillering stage active. Drip fertigation and water level monitored regularly.',
     createdAt: getRelativeDate(-50)
   },
   {
@@ -421,7 +421,7 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
 ];
 
 export const INITIAL_WEATHER: WeatherData = {
-  location: 'Indore North Sector (M.P.)',
+  location: 'Ranchi District, Jharkhand',
   currentTemp: 29,
   feelsLike: 31,
   humidity: 68,

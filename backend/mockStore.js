@@ -3,15 +3,15 @@
 const mockUsers = [
   {
     id: 'usr_01',
-    name: 'Rajesh Patel',
+    name: 'Rajesh Verma',
     email: 'rajesh.farmer@agropulse.io',
     phone: '+91 98765 43210',
     password: 'Password@123',
     role: 'FARM_OWNER',
     roleTitle: 'Senior Farm Manager & Agronomist',
-    region: 'Indore, Madhya Pradesh',
+    region: 'Ranchi, Jharkhand',
     farmSizeAcre: 15.2,
-    primaryCropInterest: 'Wheat, Soybean, Gram',
+    primaryCropInterest: 'Paddy (Rice), Tomato, Maize, Mustard',
     avatarBg: 'bg-emerald-700',
     createdAt: '2026-01-15'
   },
@@ -213,26 +213,26 @@ const mockFarms = [
   {
     id: 'farm_01',
     ownerId: 'usr_01',
-    farmName: 'Indore North Block (Plot A)',
-    location: 'Indore District (M.P.)',
+    farmName: 'Ranchi Valley Plot A',
+    location: 'Ranchi District, Jharkhand',
     area: 5.2,
     soilType: 'Loamy',
     irrigationType: 'Drip',
-    latitude: '22.7196',
-    longitude: '75.8577',
+    latitude: '23.3441',
+    longitude: '85.3096',
     farmNotes: 'Primary drip-fertigated block with soil sensors and drainage tiles.'
   },
   {
     id: 'farm_02',
     ownerId: 'usr_01',
-    farmName: 'Rau Valley Expansion (Plot B)',
-    location: 'Indore District (M.P.)',
+    farmName: 'Subarnarekha Basin Expansion (Plot B)',
+    location: 'Ranchi District, Jharkhand',
     area: 10.0,
-    soilType: 'Black Cotton',
+    soilType: 'Red / Laterite',
     irrigationType: 'Sprinkler',
-    latitude: '22.6284',
-    longitude: '75.7952',
-    farmNotes: 'Heavy clay soil, optimal for rainfed soybean and deep-root gram.'
+    latitude: '23.4833',
+    longitude: '85.4833',
+    farmNotes: 'Fertile red loam soil, optimal for vegetables, maize, and pulses.'
   }
 ];
 
