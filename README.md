@@ -1,10 +1,10 @@
-# 🌾 AgriTECH
+#  AgriTECH
 
 **AgriTECH** ek modern web application hai jo farmers (kisanon) aur buyers/consumers ke beech ki doori ko kam karne aur agricultural workflows ko streamline karne ke liye banaya gaya hai. Is platform ke zariye farmers apne products ko direct marketplace par list kar sakte hain aur orders manage kar sakte hain.
 
 ---
 
-## 🚀 Features
+##  Features
 
 - **Farmer Marketplace:** Farmers apne agricultural products (crops, vegetables, fruits, etc.) ko direct sell kar sakte hain.
 - **Order Flow & Management:** Seamless order placement, tracking, aur management capabilities.
@@ -13,7 +13,7 @@
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Frontend:** React / Vite, TypeScript, Tailwind CSS
 - **Backend:** Node.js / Express (Backend directory structure)
@@ -22,7 +22,7 @@
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 AgriTECH/
