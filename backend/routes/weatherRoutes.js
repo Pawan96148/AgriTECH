@@ -90,8 +90,12 @@ const buildWeatherData = (current, forecast, cityName) => {
   };
 };
 
+
 router.get('/', async (req, res) => {
-  const city = (req.query.city || DEFAULT_CITY).toString();
+  const { lat, lon } = req.query;
+  let rawCity = (req.query.city || DEFAULT_CITY).toString();
+  // If city contains comma like "Ranchi, Jharkhand", extract primary city
+  const city = rawCity.split(',')[0].trim();
 
   if (!WEATHER_API_KEY) {
     return res.status(500).json({
@@ -101,8 +105,17 @@ router.get('/', async (req, res) => {
   }
 
   try {
-    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric&cnt=40`;
+    let currentUrl;
+    let forecastUrl;
+    let locationLabel = city;
+
+    if (lat && lon && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
+      currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${WEATHER_API_KEY}&units=metric`;
+      forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${WEATHER_API_KEY}&units=metric&cnt=40`;
+    } else {
+      currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`;
+      forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric&cnt=40`;
+    }
 
     const [currentResponse, forecastResponse] = await Promise.all([
       fetch(currentUrl),
@@ -122,7 +135,7 @@ router.get('/', async (req, res) => {
       forecastResponse.json()
     ]);
 
-    const weather = buildWeatherData(current, forecast, city);
+    const weather = buildWeatherData(current, forecast, current.name || locationLabel);
 
     return res.json({ success: true, weather });
   } catch (error) {

@@ -2,20 +2,6 @@
 
 const mockUsers = [
   {
-    id: 'usr_01',
-    name: 'Rajesh Verma',
-    email: 'rajesh.farmer@agropulse.io',
-    phone: '+91 98765 43210',
-    password: 'Password@123',
-    role: 'FARM_OWNER',
-    roleTitle: 'Senior Farm Manager & Agronomist',
-    region: 'Ranchi, Jharkhand',
-    farmSizeAcre: 15.2,
-    primaryCropInterest: 'Paddy (Rice), Tomato, Maize, Mustard',
-    avatarBg: 'bg-emerald-700',
-    createdAt: '2026-01-15'
-  },
-  {
     id: 'usr_farmer_jharkhand',
     name: 'Ramesh Mahto',
     email: 'ramesh.farmer@jharkhandagro.in',
@@ -56,6 +42,20 @@ const mockUsers = [
     primaryCropInterest: 'Certified Seeds, Organic Fertilizers, Drip Kits',
     avatarBg: 'bg-amber-800',
     createdAt: '2026-02-05'
+  },
+  {
+    id: 'usr_delivery_01',
+    name: 'Deepak Kumar',
+    email: 'deepak.delivery@agritech.in',
+    phone: '+91 94314 77889',
+    password: 'Password@123',
+    role: 'DELIVERY_PARTNER',
+    roleTitle: 'AgriExpress Delivery Partner',
+    region: 'Ranchi, Jharkhand',
+    farmSizeAcre: 0,
+    primaryCropInterest: 'Intra-Jharkhand Cold-Line Dispatch',
+    avatarBg: 'bg-orange-700',
+    createdAt: '2026-02-15'
   }
 ];
 
@@ -70,6 +70,7 @@ const mockProducts = [
     category: 'Vegetable',
     imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80',
     availableQuantity: 450,
+    minimumOrderQuantity: 5,
     unit: 'kg',
     pricePerUnit: 28,
     harvestDate: '2026-03-28',
@@ -90,6 +91,7 @@ const mockProducts = [
     category: 'Grain & Cereal',
     imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80',
     availableQuantity: 600,
+    minimumOrderQuantity: 5,
     unit: 'kg',
     pricePerUnit: 35,
     harvestDate: '2026-03-29',
@@ -102,14 +104,15 @@ const mockProducts = [
   },
   {
     id: 'prod_jh_03',
-    farmerId: 'usr_farmer_03',
-    farmerName: 'Suresh Soren',
-    farmerPhone: '+91 94315 11223',
+    farmerId: 'usr_farmer_jharkhand',
+    farmerName: 'Ramesh Mahto',
+    farmerPhone: '+91 94311 55678',
     cropName: 'Snowball Cauliflower',
     variety: 'Snowball 16 Hybrid',
     category: 'Vegetable',
     imageUrl: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600&auto=format&fit=crop&q=80',
     availableQuantity: 280,
+    minimumOrderQuantity: 5,
     unit: 'kg',
     pricePerUnit: 32,
     harvestDate: '2026-03-27',
@@ -122,14 +125,15 @@ const mockProducts = [
   },
   {
     id: 'prod_jh_04',
-    farmerId: 'usr_farmer_04',
-    farmerName: 'Anil Munda',
-    farmerPhone: '+91 98353 44556',
+    farmerId: 'usr_farmer_jharkhand',
+    farmerName: 'Ramesh Mahto',
+    farmerPhone: '+91 94311 55678',
     cropName: 'Tender Green Peas',
     variety: 'GS-10 Sweet Pea',
     category: 'Pulse',
     imageUrl: 'https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=600&auto=format&fit=crop&q=80',
     availableQuantity: 150,
+    minimumOrderQuantity: 5,
     unit: 'kg',
     pricePerUnit: 55,
     harvestDate: '2026-03-29',
@@ -152,6 +156,8 @@ const mockOrders = [
       fullName: 'Priya Sharma',
       phone: '+91 98351 22345',
       street: 'Line Tank Road, Circular Area',
+      villageArea: 'Circular Area',
+      city: 'Ranchi',
       district: 'Ranchi',
       state: 'Jharkhand',
       pincode: '834001',
@@ -161,6 +167,21 @@ const mockOrders = [
     farmerName: 'Ramesh Mahto',
     farmerPhone: '+91 94311 55678',
     farmerLocation: 'Ranchi',
+    deliveryBoyId: 'usr_delivery_01',
+    deliveryBoyName: 'Deepak Kumar',
+    deliveryBoyPhone: '+91 94314 77889',
+    assignedAt: '2026-03-29 11:45 AM',
+    currentLocation: {
+      latitude: 23.3752,
+      longitude: 85.3340,
+      updatedAt: '2026-03-29 02:45 PM',
+      isSharing: true
+    },
+    locationHistory: [
+      { latitude: 23.4832, longitude: 85.4851, timestamp: '2026-03-29 01:00 PM', status: 'PICKED_UP' },
+      { latitude: 23.4210, longitude: 85.4020, timestamp: '2026-03-29 01:45 PM', status: 'IN_TRANSIT' },
+      { latitude: 23.3752, longitude: 85.3340, timestamp: '2026-03-29 02:45 PM', status: 'IN_TRANSIT' }
+    ],
     items: [
       {
         productId: 'prod_jh_01',
@@ -180,18 +201,18 @@ const mockOrders = [
         cropName: 'Sweet Corn Cobs',
         variety: 'Sugar-75 Gold',
         imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80',
-        quantity: 4,
+        quantity: 5,
         unit: 'kg',
         pricePerUnit: 35,
-        subtotal: 140,
+        subtotal: 175,
         farmerId: 'usr_farmer_jharkhand',
         farmerName: 'Ramesh Mahto',
         farmerLocation: 'Ranchi'
       }
     ],
-    subtotal: 280,
+    subtotal: 315,
     deliveryFee: 40,
-    totalAmount: 320,
+    totalAmount: 355,
     paymentMethod: 'UPI',
     paymentStatus: 'PAID',
     paymentId: 'PAY-MOCK-498212',
@@ -200,7 +221,8 @@ const mockOrders = [
       { status: 'ORDER_PLACED', label: 'Order Placed', timestamp: '2026-03-29 08:30 AM', location: 'Ranchi, Jharkhand', note: 'Order confirmed and verified via UPI', completed: true },
       { status: 'FARMER_ACCEPTED', label: 'Farmer Accepted', timestamp: '2026-03-29 09:15 AM', location: 'Ormanjhi Plot, Ranchi', note: 'Farmer Ramesh Mahto accepted order for harvesting', completed: true },
       { status: 'PACKED', label: 'Packed with Care', timestamp: '2026-03-29 11:30 AM', location: 'Ormanjhi Packing Shed', note: 'Vegetables graded, cleaned, and crated', completed: true },
-      { status: 'PICKED_UP', label: 'Picked Up by Courier', timestamp: '2026-03-29 01:00 PM', location: 'Ranchi North Dispatch Center', note: 'Intra-Jharkhand AgriExpress vehicle collected produce', completed: true },
+      { status: 'DELIVERY_BOY_ASSIGNED', label: 'Delivery Boy Assigned', timestamp: '2026-03-29 11:45 AM', location: 'Ranchi North Dispatch Center', note: 'Assigned to Deepak Kumar (+91 94314 77889)', completed: true },
+      { status: 'PICKED_UP', label: 'Picked Up by Courier', timestamp: '2026-03-29 01:00 PM', location: 'Ranchi North Dispatch Center', note: 'AgriExpress vehicle collected produce', completed: true },
       { status: 'IN_TRANSIT', label: 'In Transit', timestamp: '2026-03-29 02:45 PM', location: 'NH-33 Corridor, Jharkhand', note: 'Direct highway transit under climate control', completed: true },
       { status: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', timestamp: 'Pending', location: 'Ranchi City Hub', note: 'Local delivery agent will deliver to doorstep', completed: false },
       { status: 'DELIVERED', label: 'Delivered', timestamp: 'Pending', location: 'Customer Doorstep', note: 'Fresh produce handover with OTP verification', completed: false }
@@ -212,27 +234,29 @@ const mockOrders = [
 const mockFarms = [
   {
     id: 'farm_01',
-    ownerId: 'usr_01',
-    farmName: 'Ranchi Valley Plot A',
-    location: 'Ranchi District, Jharkhand',
-    area: 5.2,
+    ownerId: 'usr_farmer_jharkhand',
+    farmName: 'Ormanjhi Organic Acres (Plot A)',
+    location: 'Ranchi, Jharkhand',
+    area: 5.5,
+    areaUnit: 'Acre',
     soilType: 'Loamy',
     irrigationType: 'Drip',
-    latitude: '23.3441',
-    longitude: '85.3096',
-    farmNotes: 'Primary drip-fertigated block with soil sensors and drainage tiles.'
+    latitude: 23.4832,
+    longitude: 85.4851,
+    farmNotes: 'Primary drip-fertigated organic vegetable block with soil sensors and drainage tiles.'
   },
   {
     id: 'farm_02',
-    ownerId: 'usr_01',
-    farmName: 'Subarnarekha Basin Expansion (Plot B)',
-    location: 'Ranchi District, Jharkhand',
-    area: 10.0,
+    ownerId: 'usr_farmer_jharkhand',
+    farmName: 'Subarnarekha River Basin (Plot B)',
+    location: 'Ranchi, Jharkhand',
+    area: 3.0,
+    areaUnit: 'Acre',
     soilType: 'Red / Laterite',
     irrigationType: 'Sprinkler',
-    latitude: '23.4833',
-    longitude: '85.4833',
-    farmNotes: 'Fertile red loam soil, optimal for vegetables, maize, and pulses.'
+    latitude: 23.3850,
+    longitude: 85.3620,
+    farmNotes: 'Alluvial terrace plot optimal for sweet corn, legumes, and pulses.'
   }
 ];
 

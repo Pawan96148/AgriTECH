@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema({
     min: 0,
     default: 10
   },
+  minimumOrderQuantity: {
+    type: Number,
+    default: 5,
+    min: 1
+  },
   unit: {
     type: String,
     enum: ['kg', 'quintal', 'ton', 'crate', 'bag'],

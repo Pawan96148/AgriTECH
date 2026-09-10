@@ -322,9 +322,9 @@ export const ProfileView: React.FC = () => {
                     className="w-full bg-stone-50 border border-stone-300 rounded-xl p-2.5 text-xs font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700 transition"
                   >
                     <option value="FARM_OWNER">🌾 Farm Owner / Cultivator</option>
-                    <option value="AGRONOMIST">🧪 Agronomist / Plant Doctor</option>
-                    <option value="FIELD_MANAGER">🚜 Field Operations Manager</option>
-                    <option value="RESEARCHER">🔬 Agricultural Researcher</option>
+                    <option value="CUSTOMER">🛒 Customer / Buyer</option>
+                    <option value="DEALER">🏪 Inputs Dealer</option>
+                    <option value="DELIVERY_PARTNER">🚚 Delivery Partner</option>
                   </select>
                 </div>
               </div>

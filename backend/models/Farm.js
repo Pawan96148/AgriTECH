@@ -19,13 +19,18 @@ const farmSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    default: 'Ranchi District, Jharkhand'
+    default: 'Indore District (M.P.)'
   },
   area: {
     type: Number,
     required: true,
     min: 0.1,
     default: 5.0
+  },
+  areaUnit: {
+    type: String,
+    enum: ['Acre', 'Hectare', 'Decimal', 'Bigha'],
+    default: 'Acre'
   },
   soilType: {
     type: String,
@@ -39,11 +44,11 @@ const farmSchema = new mongoose.Schema({
   },
   latitude: {
     type: String,
-    default: '23.3441'
+    default: '22.7196'
   },
   longitude: {
     type: String,
-    default: '85.3096'
+    default: '75.8577'
   },
   farmNotes: {
     type: String,

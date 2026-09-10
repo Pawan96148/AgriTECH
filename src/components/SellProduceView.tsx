@@ -58,6 +58,7 @@ export const SellProduceView: React.FC = () => {
   const [imageUrl, setImageUrl] = useState(SAMPLE_PRODUCE_IMAGES[0].url);
   const [customImageUrl, setCustomImageUrl] = useState('');
   const [availableQuantity, setAvailableQuantity] = useState('200');
+  const [minimumOrderQuantity, setMinimumOrderQuantity] = useState('5');
   const [unit, setUnit] = useState<ProductUnit>('kg');
   const [pricePerUnit, setPricePerUnit] = useState('30');
   const [harvestDate, setHarvestDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -70,6 +71,7 @@ export const SellProduceView: React.FC = () => {
   // Edit Listing State
   const [editingItem, setEditingItem] = useState<ProductListing | null>(null);
   const [editQty, setEditQty] = useState('');
+  const [editMinQty, setEditMinQty] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [editDescription, setEditDescription] = useState('');
 
@@ -119,6 +121,7 @@ export const SellProduceView: React.FC = () => {
       category,
       imageUrl: finalImage,
       availableQuantity: parseFloat(availableQuantity) || 10,
+      minimumOrderQuantity: Math.max(1, parseFloat(minimumOrderQuantity) || 5),
       unit,
       pricePerUnit: parseFloat(pricePerUnit) || 20,
       harvestDate,
@@ -135,6 +138,7 @@ export const SellProduceView: React.FC = () => {
     setVariety('');
     setDescription('');
     setCustomImageUrl('');
+    setMinimumOrderQuantity('5');
   };
 
   const handleStartEdit = (prod: ProductListing) => {
@@ -305,8 +309,8 @@ export const SellProduceView: React.FC = () => {
               </div>
             </div>
 
-            {/* Quantity, Unit, Price */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+            {/* Quantity, Unit, Price, Min Order Qty */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-3">
               <div>
                 <label className="block font-semibold text-stone-700 text-[11px] sm:text-xs mb-1">Available Qty *</label>
                 <input
@@ -316,6 +320,20 @@ export const SellProduceView: React.FC = () => {
                   placeholder="250"
                   value={availableQuantity}
                   onChange={(e) => setAvailableQuantity(e.target.value)}
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold font-mono focus:bg-white focus:ring-2 focus:ring-emerald-700"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 text-[11px] sm:text-xs mb-1">Min Order (Bulk) *</label>
+                <input
+                  type="number"
+                  step="1"
+                  min="1"
+                  required
+                  placeholder="5"
+                  value={minimumOrderQuantity}
+                  onChange={(e) => setMinimumOrderQuantity(e.target.value)}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold font-mono focus:bg-white focus:ring-2 focus:ring-emerald-700"
                 />
               </div>

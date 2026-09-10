@@ -12,12 +12,9 @@ export type AlertPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export type UserRole = 
   | 'FARM_OWNER' 
-  | 'AGRONOMIST' 
-  | 'FIELD_MANAGER' 
-  | 'RESEARCHER' 
-  | 'TENANT_FARMER'
   | 'CUSTOMER'
-  | 'DEALER';
+  | 'DEALER'
+  | 'DELIVERY_PARTNER';
 
 export interface User {
   id: string;
@@ -48,7 +45,8 @@ export interface Farm {
   location: string;
   latitude: number;
   longitude: number;
-  area: number; // in Acres
+  area: number;
+  areaUnit?: 'Acre' | 'Hectare' | 'Decimal' | 'Bigha';
   soilType: SoilType;
   irrigationType: 'Drip' | 'Sprinkler' | 'Canal / Flood' | 'Rainfed' | 'Borewell';
   notes?: string;
@@ -127,6 +125,7 @@ export interface DailyForecast {
 }
 
 export interface WeatherData {
+  farmName?: string;
   location: string;
   currentTemp: number;
   feelsLike: number;
@@ -281,6 +280,8 @@ export interface ProductListing {
   category: 'Vegetable' | 'Grain & Cereal' | 'Fruit' | 'Pulse' | 'Cash Crop' | 'Spices';
   imageUrl: string;
   availableQuantity: number;
+  availableStock?: number; // alias for availableQuantity
+  minimumOrderQuantity: number; // in unit (default 5 for kg)
   unit: ProductUnit;
   pricePerUnit: number; // in INR (₹)
   harvestDate: string; // YYYY-MM-DD
@@ -299,6 +300,7 @@ export type DeliveryStatus =
   | 'ORDER_PLACED' 
   | 'FARMER_ACCEPTED' 
   | 'PACKED' 
+  | 'DELIVERY_BOY_ASSIGNED'
   | 'PICKED_UP' 
   | 'IN_TRANSIT' 
   | 'OUT_FOR_DELIVERY' 
@@ -318,6 +320,8 @@ export interface OrderAddress {
   fullName: string;
   phone: string;
   street: string;
+  villageArea?: string;
+  city?: string;
   district: string; // Jharkhand district
   state: 'Jharkhand';
   pincode: string;
@@ -359,6 +363,23 @@ export interface OrderReview {
   farmerReply?: FarmerReply;
 }
 
+export interface DeliveryLocation {
+  latitude: number;
+  longitude: number;
+  speed?: number;
+  heading?: number;
+  updatedAt?: string;
+  lastUpdated?: string;
+  isSharing?: boolean;
+}
+
+export interface LocationHistoryItem {
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+  status?: DeliveryStatus;
+}
+
 export interface Order {
   id: string;
   customerId: string;
@@ -369,6 +390,12 @@ export interface Order {
   farmerName: string;
   farmerPhone: string;
   farmerLocation: string;
+  deliveryBoyId?: string;
+  deliveryBoyName?: string;
+  deliveryBoyPhone?: string;
+  assignedAt?: string;
+  currentLocation?: DeliveryLocation;
+  locationHistory?: LocationHistoryItem[];
   items: OrderItem[];
   subtotal: number;
   deliveryFee: number;

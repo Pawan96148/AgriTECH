@@ -62,6 +62,8 @@ const orderSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     phone: { type: String, required: true },
     street: { type: String, required: true },
+    villageArea: { type: String },
+    city: { type: String },
     district: { type: String, required: true },
     state: { type: String, default: 'Jharkhand' },
     pincode: { type: String, required: true },
@@ -84,6 +86,31 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: 'Ranchi'
   },
+  deliveryBoyId: {
+    type: String,
+    index: true
+  },
+  deliveryBoyName: {
+    type: String
+  },
+  deliveryBoyPhone: {
+    type: String
+  },
+  assignedAt: {
+    type: String
+  },
+  currentLocation: {
+    latitude: { type: Number },
+    longitude: { type: Number },
+    updatedAt: { type: String },
+    isSharing: { type: Boolean, default: false }
+  },
+  locationHistory: [{
+    latitude: { type: Number },
+    longitude: { type: Number },
+    timestamp: { type: String },
+    status: { type: String }
+  }],
   items: [orderItemSchema],
   subtotal: {
     type: Number,
@@ -112,7 +139,7 @@ const orderSchema = new mongoose.Schema({
   },
   deliveryStatus: {
     type: String,
-    enum: ['ORDER_PLACED', 'FARMER_ACCEPTED', 'PACKED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],
+    enum: ['ORDER_PLACED', 'FARMER_ACCEPTED', 'PACKED', 'DELIVERY_BOY_ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],
     default: 'ORDER_PLACED',
     index: true
   },

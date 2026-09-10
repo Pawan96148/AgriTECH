@@ -35,8 +35,10 @@ export const CheckoutModal: React.FC = () => {
 
   // Address State (Jharkhand Restricted)
   const [fullName, setFullName] = useState(user.name || '');
-  const [phone, setPhone] = useState(user.phone || '+91 ');
+  const [phone, setPhone] = useState(user.phone || '+91 98351 22334');
   const [street, setStreet] = useState('Line Tank Road, Circular Area');
+  const [villageArea, setVillageArea] = useState('Bariatu Area');
+  const [city, setCity] = useState('Ranchi');
   const [district, setDistrict] = useState(JHARKHAND_DISTRICTS[0]); // Ranchi
   const [pincode, setPincode] = useState('834001');
   const [landmark, setLandmark] = useState('Near Albert Ekka Chowk');
@@ -63,14 +65,14 @@ export const CheckoutModal: React.FC = () => {
   useEffect(() => {
     if (user) {
       setFullName(user.name || '');
-      setPhone(user.phone || '+91 ');
+      setPhone(user.phone || '+91 98351 22334');
       setCardName(user.name || 'Priya Sharma');
     }
   }, [user]);
 
   if (!isCheckoutModalOpen) return null;
 
-  // Prepare Items to purchase: either single direct product or entire cart
+  // Prepare Items to purchase: either single direct product or entire cart (min qty >= 5kg)
   const itemsToOrder: OrderItem[] = checkoutDirectProduct
     ? [
         {
@@ -78,10 +80,10 @@ export const CheckoutModal: React.FC = () => {
           cropName: checkoutDirectProduct.cropName,
           variety: checkoutDirectProduct.variety,
           imageUrl: checkoutDirectProduct.imageUrl,
-          quantity: 1,
+          quantity: Math.max(checkoutDirectProduct.minimumOrderQuantity || 5, 5),
           unit: checkoutDirectProduct.unit,
           pricePerUnit: checkoutDirectProduct.pricePerUnit,
-          subtotal: checkoutDirectProduct.pricePerUnit,
+          subtotal: checkoutDirectProduct.pricePerUnit * Math.max(checkoutDirectProduct.minimumOrderQuantity || 5, 5),
           farmerId: checkoutDirectProduct.farmerId,
           farmerName: checkoutDirectProduct.farmerName,
           farmerLocation: checkoutDirectProduct.location
@@ -114,9 +116,24 @@ export const CheckoutModal: React.FC = () => {
       return;
     }
 
-    if (!fullName.trim() || !phone.trim() || !street.trim()) {
+    if (!fullName.trim() || !phone.trim() || !street.trim() || !villageArea.trim() || !city.trim() || !pincode.trim()) {
       setErrorMsg('Please complete all delivery address fields.');
       return;
+    }
+
+    // 10-digit Indian phone verification
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length < 10) {
+      setErrorMsg('Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    // Bulk agricultural produce minimum 5 kg check
+    for (const item of itemsToOrder) {
+      if (item.quantity < 5) {
+        setErrorMsg(`Minimum order quantity for ${item.cropName} is 5 kg (selected: ${item.quantity} kg).`);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -124,8 +141,10 @@ export const CheckoutModal: React.FC = () => {
     try {
       const deliveryAddress: OrderAddress = {
         fullName: fullName.trim(),
-        phone: phone.trim(),
+        phone: digitsOnly.slice(-10),
         street: street.trim(),
+        villageArea: villageArea.trim(),
+        city: city.trim(),
         district,
         state: 'Jharkhand',
         pincode: pincode.trim(),
@@ -301,6 +320,32 @@ export const CheckoutModal: React.FC = () => {
                 onChange={(e) => setStreet(e.target.value)}
                 className="w-full p-2 bg-stone-50 border border-stone-300 rounded-xl font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700"
               />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Village / Locality / Area *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Bariatu / Morabadi / Ormanjhi"
+                  value={villageArea}
+                  onChange={(e) => setVillageArea(e.target.value)}
+                  className="w-full p-2 bg-stone-50 border border-stone-300 rounded-xl font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">City / Town *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ranchi / Dhanbad / Jamshedpur"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full p-2 bg-stone-50 border border-stone-300 rounded-xl font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-emerald-700"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

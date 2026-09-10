@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback, ReactNode } from 'react';
 import {
   User,
   Farm,
@@ -69,6 +69,7 @@ interface FarmContextType {
   selectedFarmId: string;
   setSelectedFarmId: (id: string) => void;
   selectedFarm: Farm | undefined;
+  userTotalAcreage: number;
   addFarm: (farm: Omit<Farm, 'id' | 'userId' | 'createdAt'>) => void;
   updateFarm: (id: string, farm: Partial<Farm>) => void;
   deleteFarm: (id: string) => void;
@@ -82,6 +83,9 @@ interface FarmContextType {
   updateActivity: (id: string, data: Partial<Activity>) => void;
   deleteActivity: (id: string) => void;
   weather: WeatherData;
+  weatherLoading: boolean;
+  weatherError: string | null;
+  refreshWeather: () => void;
   setWeatherScenario: (scenario: 'rainy' | 'sunny' | 'heatwave' | 'windy' | 'monsoon') => void;
   reminders: Reminder[];
   unreadRemindersCount: number;
@@ -134,6 +138,15 @@ interface FarmContextType {
   updateOrderStatus: (orderId: string, status: DeliveryStatus, note?: string) => void;
   cancelOrder: (orderId: string, reason?: string) => void;
 
+  // Delivery Partner & Live GPS Tracking
+  deliveryPartners: User[];
+  assignDeliveryBoy: (orderId: string, deliveryBoyId: string, deliveryBoyName: string, deliveryBoyPhone: string) => Promise<boolean>;
+  updateDeliveryLocation: (orderId: string, lat: number, lng: number, speed?: number, heading?: number) => Promise<boolean>;
+  startLocationSharing: (orderId: string) => void;
+  stopLocationSharing: (orderId?: string) => void;
+  isSharingLocation: boolean;
+  activeSharingOrderId: string | null;
+
   // Customer Feedback & Farmer Replies
   addOrderReview: (orderId: string, review: Omit<OrderReview, 'id' | 'createdAt'>) => void;
   replyToOrderReview: (orderId: string, replyText: string) => void;
@@ -176,19 +189,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [user, setUser] = useState<User>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}user`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.region?.includes('Indore') || parsed.region?.includes('Madhya Pradesh')) {
-          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}user`);
-          return INITIAL_USER;
-        }
-        return parsed;
-      } catch {
-        return INITIAL_USER;
-      }
-    }
-    return INITIAL_USER;
+    return saved ? JSON.parse(saved) : INITIAL_USER;
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -201,22 +202,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [farms, setFarms] = useState<Farm[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const hasLegacyIndore = Array.isArray(parsed) && parsed.some((f: Farm) =>
-          f.location?.includes('Indore') || f.location?.includes('Narmada') || f.location?.includes('Malwa')
-        );
-        if (hasLegacyIndore) {
-          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`);
-          return INITIAL_FARMS;
-        }
-        return parsed;
-      } catch {
-        return INITIAL_FARMS;
-      }
-    }
-    return INITIAL_FARMS;
+    return saved ? JSON.parse(saved) : INITIAL_FARMS;
   });
 
   const [selectedFarmId, setSelectedFarmId] = useState<string>(() => {
@@ -225,22 +211,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [crops, setCrops] = useState<Crop[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const hasLegacyCotton = Array.isArray(parsed) && parsed.some((c: Crop) =>
-          c.cropName?.toLowerCase().includes('cotton')
-        );
-        if (hasLegacyCotton) {
-          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`);
-          return INITIAL_CROPS;
-        }
-        return parsed;
-      } catch {
-        return INITIAL_CROPS;
-      }
-    }
-    return INITIAL_CROPS;
+    return saved ? JSON.parse(saved) : INITIAL_CROPS;
   });
 
   const [activities, setActivities] = useState<Activity[]>(() => {
@@ -250,42 +221,79 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [weather, setWeather] = useState<WeatherData>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.location?.includes('Indore') || parsed.location?.includes('Delhi') || parsed.location?.includes('M.P.')) {
-          localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`);
-          return INITIAL_WEATHER;
-        }
-        return parsed;
-      } catch {
-        return INITIAL_WEATHER;
-      }
-    }
-    return INITIAL_WEATHER;
+    return saved ? JSON.parse(saved) : INITIAL_WEATHER;
   });
 
-  useEffect(() => {
-    const fetchLiveWeather = async () => {
-      try {
-        const currentFarm = farms.find(f => f.id === selectedFarmId) || farms[0];
-        const cityCandidate = currentFarm?.location
-          ? currentFarm.location.split(/[,(]/)[0].replace(/District/i, '').trim()
-          : 'Ranchi';
-        const targetCity = cityCandidate || 'Ranchi';
-        const res = await fetch(`http://localhost:5000/api/weather?city=${encodeURIComponent(targetCity)}`);
-        if (!res.ok) throw new Error('Weather request failed');
-        const data = await res.json();
-        if (data?.success && data?.weather) {
-          setWeather(data.weather);
-        }
-      } catch {
-        setWeather(INITIAL_WEATHER);
-      }
-    };
+  const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
+  const selectedFarm = useMemo(() => {
+    return farms.find(f => f.id === selectedFarmId) || farms[0];
+  }, [farms, selectedFarmId]);
+
+  const userFarms = useMemo(() => {
+    return farms.filter(f => f.userId === user.id);
+  }, [farms, user.id]);
+
+  const userTotalAcreage = useMemo(() => {
+    return userFarms.reduce((sum, f) => {
+      let acres = Number(f.area) || 0;
+      if (f.areaUnit === 'Hectare') acres *= 2.47105;
+      else if (f.areaUnit === 'Decimal') acres *= 0.01;
+      else if (f.areaUnit === 'Bigha') acres *= 0.62;
+      return sum + acres;
+    }, 0);
+  }, [userFarms]);
+
+  const deliveryPartners = useMemo(() => {
+    return registeredAccounts.filter(acc => acc.role === 'DELIVERY_PARTNER');
+  }, [registeredAccounts]);
+
+  const fetchLiveWeather = useCallback(async () => {
+    setWeatherLoading(true);
+    setWeatherError(null);
+    try {
+      let queryParam = '';
+      if (selectedFarm?.latitude && selectedFarm?.longitude) {
+        queryParam = `lat=${selectedFarm.latitude}&lon=${selectedFarm.longitude}`;
+      } else if (selectedFarm?.location) {
+        const city = selectedFarm.location.split(',')[0].replace(/\(.*\)/, '').trim();
+        queryParam = `city=${encodeURIComponent(city || 'Ranchi')}`;
+      } else if (user?.region) {
+        const city = user.region.split(',')[0].trim();
+        queryParam = `city=${encodeURIComponent(city || 'Ranchi')}`;
+      } else {
+        queryParam = 'city=Ranchi';
+      }
+
+      const res = await fetch(`http://localhost:5000/api/weather?${queryParam}`);
+      if (!res.ok) throw new Error(`Weather fetch failed: ${res.statusText}`);
+      const data = await res.json();
+      if (data?.success && data?.weather) {
+        setWeather(data.weather);
+        setWeatherError(null);
+      } else {
+        throw new Error(data?.message || 'Invalid weather response');
+      }
+    } catch (err: any) {
+      setWeatherError(err.message || 'Unable to connect to live weather service');
+      setWeather(prev => ({
+        ...prev,
+        location: selectedFarm?.location || user?.region || 'Ranchi, Jharkhand',
+        farmName: selectedFarm?.farmName || 'Jharkhand Cultivation Plot'
+      }));
+    } finally {
+      setWeatherLoading(false);
+    }
+  }, [selectedFarm, user?.region]);
+
+  useEffect(() => {
     fetchLiveWeather();
-  }, [selectedFarmId, farms]);
+  }, [fetchLiveWeather]);
+
+  const refreshWeather = () => {
+    fetchLiveWeather();
+  };
 
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}expenses`);
@@ -469,12 +477,9 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const roleNameMap: Record<UserRole, string> = {
       FARM_OWNER: 'Lead Cultivator & Farm Owner',
-      AGRONOMIST: 'Senior Agronomist & Crop Consultant',
-      FIELD_MANAGER: 'Field Operations & Machinery Manager',
-      RESEARCHER: 'Agricultural Scientist / Researcher',
-      TENANT_FARMER: 'Cultivator & Tenant Producer',
       CUSTOMER: 'Direct Agro Consumer & Buyer',
-      DEALER: 'Authorized Input & Equipment Dealer'
+      DEALER: 'Authorized Farm Inputs & Equipment Dealer',
+      DELIVERY_PARTNER: 'Verified Jharkhand Delivery Partner'
     };
 
     const assignedRole = data.role || 'FARM_OWNER';
@@ -484,8 +489,8 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       switch (r) {
         case 'CUSTOMER': return 'bg-lime-700';
         case 'DEALER': return 'bg-amber-800';
-        case 'AGRONOMIST': return 'bg-teal-700';
-        case 'FIELD_MANAGER': return 'bg-amber-700';
+        case 'DELIVERY_PARTNER': return 'bg-emerald-600';
+        case 'FARM_OWNER':
         default: return 'bg-emerald-700';
       }
     };
@@ -620,9 +625,6 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { success: true };
   };
 
-  const selectedFarm = useMemo(() => {
-    return farms.find(f => f.id === selectedFarmId) || farms[0];
-  }, [farms, selectedFarmId]);
 
   // Evaluate deterministic rules whenever state updates
   const reminders = useMemo(() => {
@@ -932,6 +934,37 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     paymentMethod: 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
     items: OrderItem[];
   }): Promise<Order> => {
+    // 1. Jharkhand-only check
+    if (!orderData.customerAddress.state || orderData.customerAddress.state.trim().toLowerCase() !== 'jharkhand') {
+      showToast('Currently available only within Jharkhand.');
+      throw new Error('Currently available only within Jharkhand.');
+    }
+
+    // 2. 10-digit phone check
+    const cleanPhone = (orderData.customerAddress.phone || '').replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      showToast('Please provide a valid 10-digit phone number.');
+      throw new Error('Please provide a valid 10-digit phone number.');
+    }
+
+    // 3. Minimum order quantity (>= 5kg) & stock validation
+    for (const it of orderData.items) {
+      const prod = products.find(p => p.id === it.productId);
+      const minQty = prod?.minimumOrderQuantity || 5;
+      if (it.quantity < minQty) {
+        showToast(`Minimum order quantity for ${it.cropName} is ${minQty} ${it.unit}.`);
+        throw new Error(`Minimum order quantity for ${it.cropName} is ${minQty} ${it.unit}.`);
+      }
+      if (prod && prod.availableQuantity < it.quantity) {
+        showToast(`${it.cropName} only has ${prod.availableQuantity} ${prod.unit} available in stock.`);
+        throw new Error(`${it.cropName} only has ${prod.availableQuantity} ${prod.unit} available in stock.`);
+      }
+      if (prod && prod.stockStatus === 'OUT_OF_STOCK') {
+        showToast(`${it.cropName} is currently out of stock.`);
+        throw new Error(`${it.cropName} is currently out of stock.`);
+      }
+    }
+
     const subtotal = orderData.items.reduce((acc, it) => acc + it.subtotal, 0);
     const deliveryFee = 40;
     const totalAmount = subtotal + deliveryFee;
@@ -992,11 +1025,19 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           completed: false
         },
         {
+          status: 'DELIVERY_BOY_ASSIGNED',
+          label: 'Delivery Boy Assigned',
+          timestamp: 'Pending',
+          location: `${primaryFarmerLocation}, Jharkhand`,
+          note: 'Farmer assigns verified delivery partner',
+          completed: false
+        },
+        {
           status: 'PICKED_UP',
           label: 'Picked Up',
           timestamp: 'Pending',
           location: 'Regional Farm Hub Dispatch',
-          note: 'AgriTech logistics collection from farm gate',
+          note: 'Delivery partner collected produce from farm gate',
           completed: false
         },
         {
@@ -1029,7 +1070,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updatedAt: formattedNow
     };
 
-    // Deduct stock from products
+    // Deduct stock atomically from products
     setProducts(prevProds =>
       prevProds.map(prod => {
         const matchingItem = orderData.items.find(it => it.productId === prod.id);
@@ -1076,6 +1117,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           'ORDER_PLACED',
           'FARMER_ACCEPTED',
           'PACKED',
+          'DELIVERY_BOY_ASSIGNED',
           'PICKED_UP',
           'IN_TRANSIT',
           'OUT_FOR_DELIVERY',
@@ -1114,6 +1156,12 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     if (status === 'DELIVERED') {
+      if (geoWatchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(geoWatchIdRef.current);
+        geoWatchIdRef.current = null;
+        setActiveSharingOrderId(null);
+        setIsSharingLocation(false);
+      }
       try {
         confetti({ particleCount: 70, spread: 80, origin: { y: 0.7 } });
       } catch {
@@ -1136,6 +1184,141 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       })
     );
     showToast(`Order #${orderId} has been cancelled.`);
+  };
+
+  // Delivery Partner & Live GPS Tracking
+  const [isSharingLocation, setIsSharingLocation] = useState<boolean>(false);
+  const [activeSharingOrderId, setActiveSharingOrderId] = useState<string | null>(null);
+  const geoWatchIdRef = useRef<number | null>(null);
+
+  const assignDeliveryBoy = async (
+    orderId: string,
+    deliveryBoyId: string,
+    deliveryBoyName: string,
+    deliveryBoyPhone: string
+  ): Promise<boolean> => {
+    const now = new Date();
+    const formattedNow = `${now.toISOString().split('T')[0]} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id !== orderId) return ord;
+        const updatedTimeline = ord.timeline.map(m => {
+          if (m.status === 'DELIVERY_BOY_ASSIGNED') {
+            return {
+              ...m,
+              completed: true,
+              timestamp: formattedNow,
+              note: `Assigned to delivery partner ${deliveryBoyName} (${deliveryBoyPhone})`
+            };
+          }
+          return m;
+        });
+
+        return {
+          ...ord,
+          deliveryBoyId,
+          deliveryBoyName,
+          deliveryBoyPhone,
+          assignedAt: formattedNow,
+          deliveryStatus: 'DELIVERY_BOY_ASSIGNED',
+          timeline: updatedTimeline,
+          updatedAt: formattedNow
+        };
+      })
+    );
+
+    try {
+      await fetch(`http://localhost:5000/api/orders/${orderId}/assign`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deliveryBoyId, deliveryBoyName, deliveryBoyPhone })
+      });
+    } catch {
+      // offline / mock fallback
+    }
+
+    showToast(`Delivery partner ${deliveryBoyName} assigned to Order #${orderId}`);
+    return true;
+  };
+
+  const updateDeliveryLocation = async (
+    orderId: string,
+    lat: number,
+    lng: number,
+    speed?: number,
+    heading?: number
+  ): Promise<boolean> => {
+    const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id !== orderId) return ord;
+        const newLoc = {
+          latitude: lat,
+          longitude: lng,
+          speed: speed || 0,
+          heading: heading || 0,
+          lastUpdated: nowStr
+        };
+        const existingHistory = ord.locationHistory || [];
+        return {
+          ...ord,
+          currentLocation: newLoc,
+          locationHistory: [...existingHistory.slice(-20), { latitude: lat, longitude: lng, timestamp: nowStr }]
+        };
+      })
+    );
+
+    try {
+      await fetch(`http://localhost:5000/api/orders/${orderId}/location`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitude: lat, longitude: lng, speed, heading })
+      });
+    } catch {
+      // benign
+    }
+    return true;
+  };
+
+  const startLocationSharing = (orderId: string) => {
+    if (!navigator.geolocation) {
+      showToast('Geolocation is not supported by your browser');
+      return;
+    }
+    if (geoWatchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(geoWatchIdRef.current);
+    }
+    setActiveSharingOrderId(orderId);
+    setIsSharingLocation(true);
+    geoWatchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        updateDeliveryLocation(
+          orderId,
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.speed || 0,
+          pos.coords.heading || 0
+        );
+      },
+      (err) => {
+        console.error('Geolocation error:', err);
+        showToast(`GPS Error: ${err.message}`);
+      },
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+    showToast(`Live GPS location sharing started for Order #${orderId}`);
+  };
+
+  const stopLocationSharing = (orderId?: string) => {
+    if (geoWatchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(geoWatchIdRef.current);
+      geoWatchIdRef.current = null;
+    }
+    setActiveSharingOrderId(null);
+    setIsSharingLocation(false);
+    showToast('Live GPS sharing stopped.');
   };
 
   // Feedback Handlers
@@ -1237,6 +1420,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         selectedFarmId,
         setSelectedFarmId,
         selectedFarm,
+        userTotalAcreage,
         addFarm,
         updateFarm,
         deleteFarm,
@@ -1250,6 +1434,9 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateActivity,
         deleteActivity,
         weather,
+        weatherLoading,
+        weatherError,
+        refreshWeather,
         setWeatherScenario,
         reminders,
         unreadRemindersCount,
@@ -1294,6 +1481,14 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         createOrder,
         updateOrderStatus,
         cancelOrder,
+        // Delivery Partner & Live GPS Tracking
+        deliveryPartners,
+        assignDeliveryBoy,
+        updateDeliveryLocation,
+        startLocationSharing,
+        stopLocationSharing,
+        isSharingLocation,
+        activeSharingOrderId,
         // Feedback & Replies
         addOrderReview,
         replyToOrderReview,

@@ -33,23 +33,31 @@ export const OrdersView: React.FC = () => {
     setTrackingOrderId,
     setFeedbackOrderId,
     setActiveTab,
-    user
+    user,
+    deliveryPartners,
+    assignDeliveryBoy,
+    startLocationSharing,
+    stopLocationSharing,
+    isSharingLocation,
+    activeSharingOrderId
   } = useFarm();
 
-  // Mode: Customer ("My Orders"), Farmer ("Incoming Orders"), or Dealer Network
-  const [viewMode, setViewMode] = useState<'CUSTOMER' | 'FARMER' | 'DEALER'>(() => {
+  // Mode: Customer ("My Orders"), Farmer ("Incoming Orders"), Dealer Network, or Delivery Partner
+  const [viewMode, setViewMode] = useState<'CUSTOMER' | 'FARMER' | 'DEALER' | 'DELIVERY_PARTNER'>(() => {
     if (user.role === 'CUSTOMER') return 'CUSTOMER';
     if (user.role === 'DEALER') return 'DEALER';
+    if (user.role === 'DELIVERY_PARTNER') return 'DELIVERY_PARTNER';
     return 'FARMER';
   });
 
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [replyInputMap, setReplyInputMap] = useState<Record<string, string>>({});
   const [showReplyBoxForOrder, setShowReplyBoxForOrder] = useState<string | null>(null);
+  const [selectedDeliveryBoyForOrder, setSelectedDeliveryBoyForOrder] = useState<Record<string, string>>({});
 
   // Filter orders based on active mode
   const displayedOrders = orders.filter((o) => {
-    // If Customer view: show orders made by user or all sample customer orders
+    // If Customer view: show orders made by user or sample customer
     if (viewMode === 'CUSTOMER') {
       if (user.role === 'CUSTOMER' && o.customerId !== user.id && o.customerId !== 'usr_customer_jharkhand') {
         return false;
@@ -57,10 +65,16 @@ export const OrdersView: React.FC = () => {
     }
     // If Farmer view: show orders destined for this farmer or all farmer orders
     if (viewMode === 'FARMER') {
-      // In demo mode, if logged in as Ramesh Mahto or Rajesh Verma, show their incoming orders
       if (user.role === 'FARM_OWNER' && user.id !== o.farmerId && user.id !== 'usr_farmer_jharkhand') {
         // show all demo incoming orders for broad testing
       }
+    }
+    // If Delivery Partner view: show orders assigned to this partner or in delivery pipeline
+    if (viewMode === 'DELIVERY_PARTNER') {
+      if (user.role === 'DELIVERY_PARTNER') {
+        return o.deliveryBoyId === user.id || !o.deliveryBoyId || ['PACKED', 'DELIVERY_BOY_ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.deliveryStatus);
+      }
+      return ['PACKED', 'DELIVERY_BOY_ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.deliveryStatus);
     }
 
     if (statusFilter !== 'ALL' && o.deliveryStatus !== statusFilter) {
@@ -77,6 +91,8 @@ export const OrdersView: React.FC = () => {
         return <span className="bg-blue-100 text-blue-900 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full">Farmer Accepted</span>;
       case 'PACKED':
         return <span className="bg-indigo-100 text-indigo-900 border border-indigo-200 text-[10px] font-bold px-2 py-0.5 rounded-full">Packed at Farm</span>;
+      case 'DELIVERY_BOY_ASSIGNED':
+        return <span className="bg-teal-100 text-teal-900 border border-teal-200 text-[10px] font-bold px-2 py-0.5 rounded-full">Delivery Boy Assigned</span>;
       case 'PICKED_UP':
         return <span className="bg-purple-100 text-purple-900 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-full">Picked Up</span>;
       case 'IN_TRANSIT':
@@ -169,6 +185,18 @@ export const OrdersView: React.FC = () => {
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Dealer Network</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode('DELIVERY_PARTNER')}
+            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              viewMode === 'DELIVERY_PARTNER'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'bg-stone-100 hover:bg-lime-50 text-stone-700 hover:text-emerald-950'
+            }`}
+          >
+            <Truck className="w-3.5 h-3.5" />
+            <span>Delivery Partner: Deliveries</span>
           </button>
         </div>
 
@@ -343,25 +371,68 @@ export const OrdersView: React.FC = () => {
                         ))}
                       </div>
 
-                      {/* Info Columns: Farmer Origin, Customer Destination, Financials */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-stone-100 text-xs">
+                      {/* Info Columns: Farmer Origin, Customer Destination, Delivery Partner, Financials */}
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-3 border-t border-stone-100 text-xs">
                         <div className="space-y-1">
                           <span className="text-[10px] font-semibold text-stone-400 uppercase">Cultivator Details</span>
                           <p className="font-bold text-emerald-950">{order.farmerName}</p>
                           <p className="text-[11px] text-stone-500 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-emerald-700" />
+                            <MapPin className="w-3 h-3 text-emerald-700 shrink-0" />
                             <span>{order.farmerLocation}, Jharkhand</span>
                           </p>
+                          {order.farmerPhone && (
+                            <p className="text-[10px] text-stone-400 font-mono flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-stone-400 shrink-0" />
+                              <span>{order.farmerPhone}</span>
+                            </p>
+                          )}
                         </div>
 
                         <div className="space-y-1">
                           <span className="text-[10px] font-semibold text-stone-400 uppercase">Delivery Destination</span>
                           <p className="font-bold text-emerald-950">{order.deliveryAddress.fullName}</p>
-                          <p className="text-[11px] text-stone-500 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-lime-700" />
-                            <span className="truncate">{order.deliveryAddress.street}, {order.deliveryAddress.district}, JH</span>
+                          <p className="text-[11px] text-stone-600 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-lime-700 shrink-0" />
+                            <span>
+                              {order.deliveryAddress.street}
+                              {order.deliveryAddress.villageArea ? `, ${order.deliveryAddress.villageArea}` : ''}
+                              {order.deliveryAddress.city ? `, ${order.deliveryAddress.city}` : ''}
+                              , {order.deliveryAddress.district}, JH
+                            </span>
                           </p>
                           <p className="text-[10px] text-stone-400 font-mono">Pin: {order.deliveryAddress.pincode}</p>
+                          <p className="text-[10px] text-stone-600 font-mono flex items-center gap-1">
+                            <Phone className="w-3 h-3 text-stone-400 shrink-0" />
+                            <span>+91 {order.deliveryAddress.phone}</span>
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-semibold text-stone-400 uppercase">Delivery Partner</span>
+                          {order.deliveryBoyName ? (
+                            <div>
+                              <p className="font-bold text-emerald-950 flex items-center gap-1">
+                                <Truck className="w-3 h-3 text-emerald-700 shrink-0" />
+                                <span>{order.deliveryBoyName}</span>
+                              </p>
+                              <p className="text-[11px] text-stone-500 flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-stone-400 shrink-0" />
+                                <span>{order.deliveryBoyPhone}</span>
+                              </p>
+                              <span className="inline-block mt-0.5 text-[9px] bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded font-semibold">
+                                Assigned
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="text-stone-400 italic text-[11px]">
+                              <span>Not Assigned Yet</span>
+                              {order.deliveryStatus === 'PACKED' && (
+                                <span className="block text-[10px] text-amber-700 font-semibold not-italic mt-0.5">
+                                  Awaiting Farmer Dispatch
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-1 sm:text-right">
@@ -375,15 +446,15 @@ export const OrdersView: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Farmer Quick Actions (Accept / Advance Milestone) */}
+                      {/* Farmer Quick Actions (Accept / Pack / Assign Delivery Partner) */}
                       {viewMode === 'FARMER' && !isCancelled && (
                         <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-3 flex-wrap bg-lime-50/40 p-3 rounded-2xl border border-lime-200">
                           <div className="text-xs">
-                            <span className="font-bold text-emerald-950">Farmer Fulfillment Action: </span>
-                            <span className="text-stone-600">Current state is {order.deliveryStatus.replace(/_/g, ' ')}.</span>
+                            <span className="font-bold text-emerald-950">Cultivator Fulfillment: </span>
+                            <span className="text-stone-600">Current status: {order.deliveryStatus.replace(/_/g, ' ')}.</span>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             {canAccept && (
                               <>
                                 <button
@@ -411,9 +482,95 @@ export const OrdersView: React.FC = () => {
                             )}
 
                             {order.deliveryStatus === 'PACKED' && (
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <select
+                                  value={selectedDeliveryBoyForOrder[order.id] || (deliveryPartners[0]?.id || '')}
+                                  onChange={(e) =>
+                                    setSelectedDeliveryBoyForOrder((prev) => ({ ...prev, [order.id]: e.target.value }))
+                                  }
+                                  className="px-2.5 py-1.5 bg-white border border-stone-300 rounded-xl text-xs font-semibold text-stone-800 cursor-pointer"
+                                >
+                                  {deliveryPartners.map((dp) => (
+                                    <option key={dp.id} value={dp.id}>
+                                      {dp.name} ({dp.phone}) - {dp.region || 'Jharkhand'}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  onClick={() => {
+                                    const chosenId = selectedDeliveryBoyForOrder[order.id] || deliveryPartners[0]?.id;
+                                    const chosen = deliveryPartners.find((d) => d.id === chosenId) || deliveryPartners[0];
+                                    if (chosen) {
+                                      assignDeliveryBoy(order.id, chosen.id, chosen.name, chosen.phone);
+                                    }
+                                  }}
+                                  className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer transition shadow-xs"
+                                >
+                                  <Truck className="w-3.5 h-3.5 text-lime-300" />
+                                  <span>Assign Delivery Boy</span>
+                                </button>
+                              </div>
+                            )}
+
+                            {order.deliveryStatus === 'DELIVERY_BOY_ASSIGNED' && (
+                              <span className="text-xs font-semibold text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-xl">
+                                Assigned to {order.deliveryBoyName}. Awaiting logistics pickup.
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Delivery Partner Console (Milestone Progression & Real Browser GPS Sharing) */}
+                      {(viewMode === 'DELIVERY_PARTNER' || user.role === 'DELIVERY_PARTNER') && !isCancelled && (
+                        <div className="pt-3 border-t border-stone-100 bg-emerald-950 text-white p-3.5 rounded-2xl space-y-3">
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="p-1.5 bg-white/10 rounded-lg text-lime-400">
+                                <Truck className="w-4 h-4" />
+                              </span>
+                              <div>
+                                <span className="font-bold text-xs text-white">Delivery Partner Operations Console</span>
+                                <p className="text-[10px] text-emerald-200">
+                                  Pipeline: <strong className="text-lime-300 font-mono">{order.deliveryStatus.replace(/_/g, ' ')}</strong>
+                                  {order.currentLocation && (
+                                    <span className="ml-2 text-lime-200 font-mono">
+                                      • GPS: {order.currentLocation.latitude.toFixed(4)}, {order.currentLocation.longitude.toFixed(4)}
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Live GPS Broadcast Toggle */}
+                            {!isDelivered && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'PICKED_UP', 'Picked up by logistics partner')}
-                                className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                                onClick={() => {
+                                  const isBroadcastingThisOrder = isSharingLocation && activeSharingOrderId === order.id;
+                                  if (isBroadcastingThisOrder) {
+                                    stopLocationSharing(order.id);
+                                  } else {
+                                    startLocationSharing(order.id);
+                                  }
+                                }}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                                  isSharingLocation && activeSharingOrderId === order.id
+                                    ? 'bg-lime-400 text-emerald-950 hover:bg-lime-300 animate-pulse'
+                                    : 'bg-emerald-800 hover:bg-emerald-700 text-lime-200 border border-emerald-600'
+                                }`}
+                              >
+                                <span className={`w-2 h-2 rounded-full ${isSharingLocation && activeSharingOrderId === order.id ? 'bg-emerald-950' : 'bg-lime-400 animate-ping'}`}></span>
+                                <span>{isSharingLocation && activeSharingOrderId === order.id ? 'Broadcasting Live GPS (Active)' : 'Broadcast Live GPS Location'}</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Milestone Progression Buttons */}
+                          <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-emerald-800/80 text-xs">
+                            {order.deliveryStatus === 'DELIVERY_BOY_ASSIGNED' && (
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'PICKED_UP', 'Picked up from cultivator farm')}
+                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
                               >
                                 Mark as Picked Up
                               </button>
@@ -421,17 +578,17 @@ export const OrdersView: React.FC = () => {
 
                             {order.deliveryStatus === 'PICKED_UP' && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'IN_TRANSIT', 'Moving across Jharkhand highway')}
-                                className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                                onClick={() => updateOrderStatus(order.id, 'IN_TRANSIT', 'Moving along Jharkhand highway route')}
+                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
                               >
-                                Mark as In Transit
+                                Mark In Transit
                               </button>
                             )}
 
                             {order.deliveryStatus === 'IN_TRANSIT' && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'OUT_FOR_DELIVERY', 'Dispatched to customer address')}
-                                className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                                onClick={() => updateOrderStatus(order.id, 'OUT_FOR_DELIVERY', 'Dispatched to customer local area')}
+                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
                               >
                                 Mark Out for Delivery
                               </button>
@@ -439,11 +596,18 @@ export const OrdersView: React.FC = () => {
 
                             {order.deliveryStatus === 'OUT_FOR_DELIVERY' && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'DELIVERED', 'Delivered fresh to doorstep')}
-                                className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                                onClick={() => updateOrderStatus(order.id, 'DELIVERED', 'Delivered fresh produce to customer doorstep')}
+                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
                               >
                                 Mark as Delivered
                               </button>
+                            )}
+
+                            {isDelivered && (
+                              <span className="text-[11px] text-lime-300 font-semibold flex items-center gap-1.5">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-lime-400" />
+                                <span>Order completed & delivered fresh. GPS tracking closed.</span>
+                              </span>
                             )}
                           </div>
                         </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useFarm } from '../context/FarmContext';
 import { SoilType, CropStage, ActivityType, AlertPriority } from '../types';
 import { CROP_KNOWLEDGE_BASE } from '../data/cropKnowledgeBase';
-import { JHARKHAND_DISTRICTS } from '../data/mockData';
 import {
   MapPin,
   Wheat,
@@ -43,12 +42,12 @@ export const Modals: React.FC = () => {
   // Add Farm State
   // -------------------------------------------------------------
   const [farmName, setFarmName] = useState('');
-  const [location, setLocation] = useState('Ranchi District, Jharkhand');
+  const [location, setLocation] = useState('Indore District (M.P.)');
   const [area, setArea] = useState('5.0');
   const [soilType, setSoilType] = useState<SoilType>('Loamy');
   const [irrigationType, setIrrigationType] = useState<'Drip' | 'Sprinkler' | 'Canal / Flood' | 'Rainfed' | 'Borewell'>('Drip');
-  const [latitude, setLatitude] = useState('23.3441');
-  const [longitude, setLongitude] = useState('85.3096');
+  const [latitude, setLatitude] = useState('22.7196');
+  const [longitude, setLongitude] = useState('75.8577');
   const [farmNotes, setFarmNotes] = useState('');
 
   const handleAddFarmSubmit = (e: React.FormEvent) => {
@@ -60,8 +59,8 @@ export const Modals: React.FC = () => {
       area: parseFloat(area) || 1,
       soilType,
       irrigationType,
-      latitude: parseFloat(latitude) || 23.3441,
-      longitude: parseFloat(longitude) || 85.3096,
+      latitude: parseFloat(latitude) || 22.7,
+      longitude: parseFloat(longitude) || 75.8,
       notes: farmNotes
     });
     setFarmName('');
@@ -248,21 +247,14 @@ export const Modals: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Location / District (Jharkhand) *</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Location / District *</label>
                   <input
                     type="text"
                     required
-                    list="jharkhand-districts-list"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Ranchi District, Jharkhand"
                     className="w-full bg-stone-50 border border-stone-300 rounded-lg p-2 text-xs"
                   />
-                  <datalist id="jharkhand-districts-list">
-                    {JHARKHAND_DISTRICTS.map(dist => (
-                      <option key={dist} value={`${dist} District, Jharkhand`} />
-                    ))}
-                  </datalist>
                 </div>
 
                 <div>

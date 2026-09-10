@@ -44,7 +44,7 @@ export const MarketplaceView: React.FC = () => {
   const [activeDetailProduct, setActiveDetailProduct] = useState<ProductListing | null>(null);
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
 
-  const isFarmer = user.role === 'FARM_OWNER' || user.role === 'TENANT_FARMER';
+  const isFarmer = user.role === 'FARM_OWNER';
 
   // Jharkhand Districts list + outside option for testing requirement 7
   const districtOptions = ['ALL', ...JHARKHAND_DISTRICTS, 'Outside Jharkhand'];
@@ -89,14 +89,15 @@ export const MarketplaceView: React.FC = () => {
     });
   }, [products, selectedDistrict, selectedCategory, selectedGrade, searchQuery, isOutsideJharkhandSelected]);
 
-  const handleQtyChange = (productId: string, delta: number, maxQty: number) => {
-    const current = quantityMap[productId] || 1;
-    const next = Math.max(1, Math.min(current + delta, maxQty));
+  const handleQtyChange = (productId: string, delta: number, maxQty: number, minQty: number = 5) => {
+    const current = quantityMap[productId] || minQty;
+    const next = Math.max(minQty, Math.min(current + delta, maxQty));
     setQuantityMap((prev) => ({ ...prev, [productId]: next }));
   };
 
   const handleBuyNow = (product: ProductListing) => {
-    const qty = quantityMap[product.id] || 1;
+    const minQty = product.minimumOrderQuantity || 5;
+    const qty = quantityMap[product.id] || minQty;
     setCheckoutDirectProduct(product);
     setIsCheckoutModalOpen(true);
   };
@@ -298,7 +299,8 @@ export const MarketplaceView: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filteredProducts.map((prod) => {
-                const qty = quantityMap[prod.id] || 1;
+                const minQty = prod.minimumOrderQuantity || 5;
+                const qty = quantityMap[prod.id] || minQty;
                 const isSoldOut = prod.stockStatus === 'OUT_OF_STOCK' || prod.availableQuantity <= 0;
 
                 return (
@@ -359,6 +361,12 @@ export const MarketplaceView: React.FC = () => {
                           </p>
                         )}
 
+                        {/* Minimum Order Quantity Badge */}
+                        <div className="mt-2 flex items-center justify-between text-[11px] text-emerald-900 bg-lime-50 px-2.5 py-1 rounded-lg border border-lime-200">
+                          <span className="font-semibold">Minimum order quantity: {minQty} {prod.unit}</span>
+                          <span className="text-[10px] text-emerald-700 font-medium">Bulk Harvest</span>
+                        </div>
+
                         {/* Farmer & Location Info */}
                         <div className="mt-2.5 pt-2.5 border-t border-stone-100 space-y-1 text-xs">
                           <div className="flex items-center justify-between text-stone-700">
@@ -390,15 +398,17 @@ export const MarketplaceView: React.FC = () => {
                               <span className="text-[11px] font-semibold text-stone-600">Qty ({prod.unit}):</span>
                               <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50">
                                 <button
-                                  onClick={() => handleQtyChange(prod.id, -1, prod.availableQuantity)}
-                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 cursor-pointer text-xs"
+                                  onClick={() => handleQtyChange(prod.id, -1, prod.availableQuantity, minQty)}
+                                  disabled={qty <= minQty}
+                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
                                 <span className="px-2 font-mono font-bold text-xs text-stone-900">{qty}</span>
                                 <button
-                                  onClick={() => handleQtyChange(prod.id, 1, prod.availableQuantity)}
-                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 cursor-pointer text-xs"
+                                  onClick={() => handleQtyChange(prod.id, 1, prod.availableQuantity, minQty)}
+                                  disabled={qty >= prod.availableQuantity}
+                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
@@ -606,7 +616,7 @@ export const MarketplaceView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    addToCart(activeDetailProduct, 1);
+                    addToCart(activeDetailProduct, activeDetailProduct.minimumOrderQuantity || 5);
                     setActiveDetailProduct(null);
                   }}
                   className="px-4 py-2 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold text-xs rounded-xl border border-lime-300 cursor-pointer"

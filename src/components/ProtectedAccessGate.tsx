@@ -141,7 +141,7 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-bold text-emerald-700 pt-2 border-t border-stone-100">
-                  <span>Sign In as {acc.role === 'AGRONOMIST' ? 'Agronomist' : 'Farmer'}</span>
+                  <span>Sign In as {acc.role === 'FARM_OWNER' ? 'Farm Owner' : acc.roleTitle || 'User'}</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </button>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useFarm } from '../context/FarmContext';
 import { ActiveTab } from '../types';
 import { 
@@ -97,19 +97,40 @@ export const Navbar: React.FC = () => {
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : 'FM';
 
-  const navItems: { id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: 'landing', label: 'Home', icon: Home },
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'marketplace', label: 'Marketplace', icon: Store },
-    { id: 'sell-produce', label: 'Sell Produce', icon: Sparkles },
-    { id: 'orders', label: 'Orders', icon: ShoppingBag },
-    { id: 'farms', label: 'My Farms', icon: MapPin },
-    { id: 'crops', label: 'Crops', icon: Wheat },
-    { id: 'activities', label: 'Schedule', icon: CalendarCheck },
-    { id: 'weather', label: 'Weather', icon: CloudSun },
-    { id: 'knowledge', label: 'Crop Guide', icon: BookOpen },
-    { id: 'expenses', label: 'Expenses', icon: DollarSign },
-  ];
+  const navItems = useMemo(() => {
+    const allItems: { id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+      { id: 'landing', label: 'Home', icon: Home },
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'marketplace', label: 'Marketplace', icon: Store },
+      { id: 'sell-produce', label: 'Sell Produce', icon: Sparkles },
+      { id: 'orders', label: user.role === 'DELIVERY_PARTNER' ? 'Deliveries' : 'Orders', icon: user.role === 'DELIVERY_PARTNER' ? Truck : ShoppingBag },
+      { id: 'farms', label: 'My Farms', icon: MapPin },
+      { id: 'crops', label: 'Crops', icon: Wheat },
+      { id: 'activities', label: 'Schedule', icon: CalendarCheck },
+      { id: 'weather', label: 'Weather', icon: CloudSun },
+      { id: 'knowledge', label: 'Crop Guide', icon: BookOpen },
+      { id: 'expenses', label: 'Expenses', icon: DollarSign },
+    ];
+
+    if (!isAuthenticated) {
+      return allItems.filter(item => ['landing', 'marketplace', 'weather', 'knowledge'].includes(item.id));
+    }
+
+    if (user.role === 'CUSTOMER') {
+      return allItems.filter(item => ['landing', 'marketplace', 'orders', 'weather'].includes(item.id));
+    }
+
+    if (user.role === 'DELIVERY_PARTNER') {
+      return allItems.filter(item => ['landing', 'dashboard', 'orders', 'weather'].includes(item.id));
+    }
+
+    if (user.role === 'DEALER') {
+      return allItems.filter(item => ['landing', 'dashboard', 'marketplace', 'orders', 'weather'].includes(item.id));
+    }
+
+    // Default FARM_OWNER gets full suite
+    return allItems;
+  }, [user.role, isAuthenticated]);
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-lime-200/80 shadow-xs">

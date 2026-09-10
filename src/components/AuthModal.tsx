@@ -479,7 +479,7 @@ export const AuthModal: React.FC = () => {
               <form onSubmit={handleSignupSubmit} className="space-y-3 text-xs">
                 {/* Full Name */}
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Full Name (Cultivator / Agronomist) *</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Full Name *</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
                       <UserIcon className="w-4 h-4" />
@@ -538,7 +538,7 @@ export const AuthModal: React.FC = () => {
                 {/* Role Selector */}
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Your Primary Agricultural Role *</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setSignupRole('FARM_OWNER')}
@@ -551,7 +551,7 @@ export const AuthModal: React.FC = () => {
                       <div className="flex items-center gap-1.5 text-xs font-bold">
                         <span>🌾 Farm Owner</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Direct land cultivation & plot ownership</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Direct land cultivation & produce seller</p>
                     </button>
 
                     <button
@@ -566,7 +566,7 @@ export const AuthModal: React.FC = () => {
                       <div className="flex items-center gap-1.5 text-xs font-bold">
                         <span>🛒 Customer / Buyer</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Direct farmer produce purchaser</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Direct farm produce purchaser</p>
                     </button>
 
                     <button
@@ -586,47 +586,17 @@ export const AuthModal: React.FC = () => {
 
                     <button
                       type="button"
-                      onClick={() => setSignupRole('AGRONOMIST')}
+                      onClick={() => setSignupRole('DELIVERY_PARTNER')}
                       className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        signupRole === 'AGRONOMIST'
+                        signupRole === 'DELIVERY_PARTNER'
                           ? 'bg-emerald-50 border-emerald-600 text-emerald-950 font-bold'
                           : 'bg-stone-50 hover:bg-stone-100 border-stone-200 text-stone-700'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 text-xs font-bold">
-                        <span>🧪 Agronomist</span>
+                        <span>🚚 Delivery Partner</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Crop doctor & soil consultant</p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setSignupRole('FIELD_MANAGER')}
-                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        signupRole === 'FIELD_MANAGER'
-                          ? 'bg-emerald-50 border-emerald-600 text-emerald-950 font-bold'
-                          : 'bg-stone-50 hover:bg-stone-100 border-stone-200 text-stone-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 text-xs font-bold">
-                        <span>🚜 Field Manager</span>
-                      </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Machinery & operations manager</p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setSignupRole('RESEARCHER')}
-                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        signupRole === 'RESEARCHER'
-                          ? 'bg-emerald-50 border-emerald-600 text-emerald-950 font-bold'
-                          : 'bg-stone-50 hover:bg-stone-100 border-stone-200 text-stone-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 text-xs font-bold">
-                        <span>🔬 Researcher</span>
-                      </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">Agricultural trials & analytics</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">Verified local logistics & cold delivery</p>
                     </button>
                   </div>
                 </div>
