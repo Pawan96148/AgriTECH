@@ -19,7 +19,7 @@ const farmSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    default: 'Indore District (M.P.)'
+    default: 'Ormanjhi, Ranchi (Jharkhand)'
   },
   area: {
     type: Number,
@@ -44,11 +44,11 @@ const farmSchema = new mongoose.Schema({
   },
   latitude: {
     type: String,
-    default: '22.7196'
+    default: '23.4833'
   },
   longitude: {
     type: String,
-    default: '75.8577'
+    default: '85.4833'
   },
   farmNotes: {
     type: String,

@@ -43,12 +43,12 @@ router.post('/', optionalAuthMiddleware, async (req, res) => {
       id: `farm_${Date.now()}`,
       ownerId: req.user?.id || 'usr_01',
       farmName: farmName.trim(),
-      location: location || 'Indore District (M.P.)',
+      location: location || 'Ormanjhi, Ranchi (Jharkhand)',
       area: Number(area) || 5.0,
       soilType: soilType || 'Loamy',
       irrigationType: irrigationType || 'Drip',
-      latitude: latitude || '22.7196',
-      longitude: longitude || '75.8577',
+      latitude: latitude || '23.4833',
+      longitude: longitude || '85.4833',
       farmNotes: farmNotes || ''
     };
 
