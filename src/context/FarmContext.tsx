@@ -87,6 +87,10 @@ interface FarmContextType {
   weatherError: string | null;
   refreshWeather: () => void;
   setWeatherScenario: (scenario: 'rainy' | 'sunny' | 'heatwave' | 'windy' | 'monsoon') => void;
+  userCoordinates: { lat: number; lon: number } | null;
+  locationPermissionStatus: 'idle' | 'prompt' | 'granted' | 'denied' | 'unavailable';
+  isFallbackLocation: boolean;
+  requestUserLocation: (silent?: boolean) => Promise<void>;
   reminders: Reminder[];
   unreadRemindersCount: number;
   markReminderAsRead: (id: string) => void;
@@ -170,8 +174,12 @@ const LOCAL_STORAGE_KEY_PREFIX = 'agropulse_app_';
 
 export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Initialize state with localStorage or fallback to defaults
-  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
-    return 'landing';
+  const [activeTab, setActiveTabInternal] = useState<ActiveTab>(() => {
+    const savedAuth = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`);
+    const isAuth = savedAuth !== null ? JSON.parse(savedAuth) : false;
+    if (!isAuth) return 'landing';
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}active_tab`);
+    return (saved as ActiveTab) || 'dashboard';
   });
 
   const [registeredAccounts, setRegisteredAccounts] = useState<User[]>(() => {
@@ -194,7 +202,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`);
-    return saved !== null ? JSON.parse(saved) : true;
+    return saved !== null ? JSON.parse(saved) : false;
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -227,6 +235,14 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
   const [weatherError, setWeatherError] = useState<string | null>(null);
 
+  // Real-time Geolocation State
+  const [userCoordinates, setUserCoordinates] = useState<{ lat: number; lon: number } | null>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}user_coords`);
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [locationPermissionStatus, setLocationPermissionStatus] = useState<'idle' | 'prompt' | 'granted' | 'denied' | 'unavailable'>('idle');
+  const [isFallbackLocation, setIsFallbackLocation] = useState<boolean>(true);
+
   const selectedFarm = useMemo(() => {
     return farms.find(f => f.id === selectedFarmId) || farms[0];
   }, [farms, selectedFarmId]);
@@ -249,12 +265,17 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return registeredAccounts.filter(acc => acc.role === 'DELIVERY_PARTNER');
   }, [registeredAccounts]);
 
-  const fetchLiveWeather = useCallback(async () => {
+  const fetchLiveWeather = useCallback(async (overrideLat?: number, overrideLon?: number) => {
     setWeatherLoading(true);
     setWeatherError(null);
     try {
       let queryParam = '';
-      if (selectedFarm?.latitude && selectedFarm?.longitude) {
+      const activeLat = overrideLat !== undefined ? overrideLat : userCoordinates?.lat;
+      const activeLon = overrideLon !== undefined ? overrideLon : userCoordinates?.lon;
+
+      if (activeLat !== undefined && activeLon !== undefined) {
+        queryParam = `lat=${activeLat}&lon=${activeLon}`;
+      } else if (selectedFarm?.latitude && selectedFarm?.longitude) {
         queryParam = `lat=${selectedFarm.latitude}&lon=${selectedFarm.longitude}`;
       } else if (selectedFarm?.location) {
         const city = selectedFarm.location.split(',')[0].replace(/\(.*\)/, '').trim();
@@ -271,6 +292,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const data = await res.json();
       if (data?.success && data?.weather) {
         setWeather(data.weather);
+        setIsFallbackLocation(!data.weather.isLiveGPS);
         setWeatherError(null);
       } else {
         throw new Error(data?.message || 'Invalid weather response');
@@ -282,13 +304,84 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         location: selectedFarm?.location || user?.region || 'Ranchi, Jharkhand',
         farmName: selectedFarm?.farmName || 'Jharkhand Cultivation Plot'
       }));
+      setIsFallbackLocation(true);
     } finally {
       setWeatherLoading(false);
     }
-  }, [selectedFarm, user?.region]);
+  }, [userCoordinates, selectedFarm, user?.region]);
 
+  const requestUserLocation = useCallback(async (silent = false): Promise<void> => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      setLocationPermissionStatus('unavailable');
+      setIsFallbackLocation(true);
+      if (!silent) setToastMessage('Geolocation is not supported by your browser. Using profile location.');
+      return;
+    }
+
+    setLocationPermissionStatus('prompt');
+
+    return new Promise<void>(resolve => {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          setUserCoordinates(coords);
+          setLocationPermissionStatus('granted');
+          setIsFallbackLocation(false);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}user_coords`, JSON.stringify(coords));
+          } catch {
+            // benign
+          }
+          if (!silent) setToastMessage(`🛰️ Live GPS Location active (${coords.lat.toFixed(2)}°N, ${coords.lon.toFixed(2)}°E)`);
+          fetchLiveWeather(coords.lat, coords.lon);
+          resolve();
+        },
+        err => {
+          const status = err.code === 1 ? 'denied' : 'unavailable';
+          setLocationPermissionStatus(status);
+          setIsFallbackLocation(true);
+          if (!silent) {
+            if (err.code === 1) {
+              setToastMessage('GPS location permission denied. Using profile/farm default location.');
+            } else {
+              setToastMessage('GPS signal unavailable. Using profile location.');
+            }
+          }
+          fetchLiveWeather();
+          resolve();
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+      );
+    });
+  }, [fetchLiveWeather]);
+
+  // Initial weather load & silent GPS query
   useEffect(() => {
-    fetchLiveWeather();
+    if (typeof window !== 'undefined' && navigator.geolocation && !userCoordinates) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          setUserCoordinates(coords);
+          setLocationPermissionStatus('granted');
+          setIsFallbackLocation(false);
+          fetchLiveWeather(coords.lat, coords.lon);
+        },
+        () => {
+          fetchLiveWeather();
+        },
+        { timeout: 6000 }
+      );
+    } else {
+      fetchLiveWeather();
+    }
+  }, []);
+
+  // Periodic weather auto-refresh every 10 minutes (600,000 ms)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchLiveWeather();
+    }, 600000);
+    return () => clearInterval(timer);
   }, [fetchLiveWeather]);
 
   const refreshWeather = () => {
@@ -396,6 +489,43 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, 4000);
   };
 
+  const PROTECTED_TABS: ActiveTab[] = [
+    'dashboard',
+    'farms',
+    'crops',
+    'activities',
+    'reminders',
+    'expenses',
+    'profile',
+    'marketplace',
+    'orders',
+    'sell-produce',
+    'community',
+    'plant-scanner'
+  ];
+
+  const setActiveTab = useCallback((tab: ActiveTab) => {
+    if (!isAuthenticated && PROTECTED_TABS.includes(tab)) {
+      setActiveTabInternal('landing');
+      setAuthModalMode('LOGIN');
+      setIsAuthModalOpen(true);
+      showToast('Authentication required. Please sign in to access this feature.');
+      return;
+    }
+    if (isAuthenticated && (tab === 'community' || tab === 'plant-scanner') && user?.role && user.role !== 'FARM_OWNER') {
+      showToast('This section is reserved exclusively for Cultivators and Farm Owners.');
+      return;
+    }
+    setActiveTabInternal(tab);
+    if (isAuthenticated) {
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}active_tab`, tab);
+      } catch {
+        // benign
+      }
+    }
+  }, [isAuthenticated, user?.role]);
+
   const openAuthModal = (mode: AuthMode = 'LOGIN') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
@@ -437,11 +567,11 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsAuthModalOpen(false);
 
     if (updatedUser.role === 'CUSTOMER') {
-      setActiveTab('marketplace');
-    } else if (updatedUser.role === 'DEALER') {
-      setActiveTab('orders');
+      setActiveTabInternal('marketplace');
+    } else if (updatedUser.role === 'DEALER' || updatedUser.role === 'DELIVERY_PARTNER') {
+      setActiveTabInternal('orders');
     } else {
-      setActiveTab('dashboard');
+      setActiveTabInternal('dashboard');
     }
 
     try {
@@ -517,7 +647,19 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(newUser);
     setIsAuthenticated(true);
     setIsAuthModalOpen(false);
-    setActiveTab('dashboard');
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`, JSON.stringify(true));
+    } catch {
+      // benign
+    }
+
+    if (assignedRole === 'CUSTOMER') {
+      setActiveTabInternal('marketplace');
+    } else if (assignedRole === 'DEALER' || assignedRole === 'DELIVERY_PARTNER') {
+      setActiveTabInternal('orders');
+    } else {
+      setActiveTabInternal('dashboard');
+    }
 
     try {
       confetti({
@@ -535,7 +677,13 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setIsAuthenticated(false);
-    setActiveTab('landing');
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`, JSON.stringify(false));
+      localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}active_tab`);
+    } catch {
+      // benign
+    }
+    setActiveTabInternal('landing');
     showToast('You have signed out. Explore as guest or sign back in anytime.');
   };
 
@@ -549,13 +697,18 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(updatedUser);
       setIsAuthenticated(true);
       setIsAuthModalOpen(false);
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`, JSON.stringify(true));
+      } catch {
+        // benign
+      }
 
       if (updatedUser.role === 'CUSTOMER') {
-        setActiveTab('marketplace');
-      } else if (updatedUser.role === 'DEALER') {
-        setActiveTab('orders');
+        setActiveTabInternal('marketplace');
+      } else if (updatedUser.role === 'DEALER' || updatedUser.role === 'DELIVERY_PARTNER') {
+        setActiveTabInternal('orders');
       } else {
-        setActiveTab('dashboard');
+        setActiveTabInternal('dashboard');
       }
 
       showToast(`Signed in as ${updatedUser.name} (${updatedUser.roleTitle || 'Cultivator'}).`);
@@ -568,13 +721,18 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(target);
       setIsAuthenticated(true);
       setIsAuthModalOpen(false);
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`, JSON.stringify(true));
+      } catch {
+        // benign
+      }
 
       if (target.role === 'CUSTOMER') {
-        setActiveTab('marketplace');
-      } else if (target.role === 'DEALER') {
-        setActiveTab('orders');
+        setActiveTabInternal('marketplace');
+      } else if (target.role === 'DEALER' || target.role === 'DELIVERY_PARTNER') {
+        setActiveTabInternal('orders');
       } else {
-        setActiveTab('dashboard');
+        setActiveTabInternal('dashboard');
       }
 
       showToast(`Switched active profile to ${target.name} (${target.roleTitle || 'Cultivator'}).`);
@@ -1438,6 +1596,10 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         weatherError,
         refreshWeather,
         setWeatherScenario,
+        userCoordinates,
+        locationPermissionStatus,
+        isFallbackLocation,
+        requestUserLocation,
         reminders,
         unreadRemindersCount,
         markReminderAsRead,

@@ -17,6 +17,8 @@ import { AuthModal } from './components/AuthModal';
 import { MarketplaceView } from './components/MarketplaceView';
 import { SellProduceView } from './components/SellProduceView';
 import { OrdersView } from './components/OrdersView';
+import { FarmerCommunityView } from './components/FarmerCommunityView';
+import { PlantScannerView } from './components/PlantScannerView';
 import { CheckoutModal } from './components/CheckoutModal';
 import { DeliveryTrackingModal } from './components/DeliveryTrackingModal';
 import { FeedbackModal } from './components/FeedbackModal';
@@ -97,9 +99,41 @@ const MainContent: React.FC = () => {
           />
         );
       case 'marketplace':
-        return <MarketplaceView />;
+        return isAuthenticated ? (
+          <MarketplaceView />
+        ) : (
+          <ProtectedAccessGate
+            viewName="Jharkhand Fresh Marketplace"
+            description="Sign in to your account to browse direct-from-farm harvests, purchase verified fresh crops, or manage buyer orders."
+          />
+        );
       case 'orders':
-        return <OrdersView />;
+        return isAuthenticated ? (
+          <OrdersView />
+        ) : (
+          <ProtectedAccessGate
+            viewName="Direct Orders & Fulfillment"
+            description="Sign in to track live orders, manage dispatch milestones, and view delivery updates."
+          />
+        );
+      case 'community':
+        return isAuthenticated ? (
+          <FarmerCommunityView />
+        ) : (
+          <ProtectedAccessGate
+            viewName="District Farmer Community"
+            description="Sign in to your cultivator account to connect with fellow district farmers, ask crop questions, and discuss Mandi prices."
+          />
+        );
+      case 'plant-scanner':
+        return isAuthenticated ? (
+          <PlantScannerView />
+        ) : (
+          <ProtectedAccessGate
+            viewName="Plant & Crop Disease Scanner"
+            description="Sign in to your cultivator account to capture or upload crop foliage photos and receive instant AI diagnosis and prescriptions."
+          />
+        );
       case 'sell-produce':
         return isAuthenticated ? (
           <SellProduceView />
@@ -142,7 +176,7 @@ const MainContent: React.FC = () => {
       {/* Universal AgriTech Footer */}
       <footer className="bg-emerald-950 text-emerald-100 border-t border-emerald-900 mt-12 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 items-start">
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg bg-lime-400 text-emerald-950 flex items-center justify-center font-bold">
@@ -155,33 +189,36 @@ const MainContent: React.FC = () => {
               </p>
             </div>
 
-            <div>
-              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">Farm Management</h4>
-              <ul className="space-y-1.5 text-xs text-emerald-200">
-                <li><button onClick={() => setActiveTab('dashboard')} className="hover:text-white transition">Farmer Dashboard</button></li>
-                <li><button onClick={() => setActiveTab('sell-produce')} className="hover:text-white transition">Sell Produce / Post Harvest</button></li>
-                <li><button onClick={() => setActiveTab('orders')} className="hover:text-white transition">Direct Orders & Fulfillment</button></li>
-                <li><button onClick={() => setActiveTab('farms')} className="hover:text-white transition">Registered Land Plots</button></li>
-                <li><button onClick={() => setActiveTab('crops')} className="hover:text-white transition">Crop Life-Cycles</button></li>
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider">Farm Management</h4>
+              <ul className="space-y-2 text-xs text-emerald-200/90 font-medium">
+                <li><button onClick={() => setActiveTab('dashboard')} className="hover:text-white transition cursor-pointer text-left">Farmer Dashboard</button></li>
+                <li><button onClick={() => setActiveTab('community')} className="hover:text-white transition cursor-pointer text-left font-semibold text-lime-300">District Farmer Community</button></li>
+                <li><button onClick={() => setActiveTab('plant-scanner')} className="hover:text-white transition cursor-pointer text-left font-semibold text-lime-300">Plant Disease Scanner</button></li>
+                <li><button onClick={() => setActiveTab('sell-produce')} className="hover:text-white transition cursor-pointer text-left">Sell Produce / Post Harvest</button></li>
+                <li><button onClick={() => setActiveTab('orders')} className="hover:text-white transition cursor-pointer text-left">Direct Orders & Fulfillment</button></li>
+                <li><button onClick={() => setActiveTab('farms')} className="hover:text-white transition cursor-pointer text-left">Registered Land Plots</button></li>
+                <li><button onClick={() => setActiveTab('crops')} className="hover:text-white transition cursor-pointer text-left">Crop Life-Cycles</button></li>
               </ul>
             </div>
 
-            <div>
-              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">Market & Intelligence</h4>
-              <ul className="space-y-1.5 text-xs text-emerald-200">
-                <li><button onClick={() => setActiveTab('marketplace')} className="hover:text-white transition font-semibold text-lime-300">Jharkhand Fresh Marketplace</button></li>
-                <li><button onClick={() => setActiveTab('weather')} className="hover:text-white transition">Localized 5-Day Weather</button></li>
-                <li><button onClick={() => setActiveTab('reminders')} className="hover:text-white transition">Deterministic Rule Advisories</button></li>
-                <li><button onClick={() => setActiveTab('knowledge')} className="hover:text-white transition">Predefined Crop Encyclopedia</button></li>
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider">Market & Intelligence</h4>
+              <ul className="space-y-2 text-xs text-emerald-200/90 font-medium">
+                <li><button onClick={() => setActiveTab('marketplace')} className="hover:text-white transition cursor-pointer text-left font-semibold text-lime-300">Jharkhand Fresh Marketplace</button></li>
+                <li><button onClick={() => setActiveTab('weather')} className="hover:text-white transition cursor-pointer text-left">Localized 5-Day Weather</button></li>
+                <li><button onClick={() => setActiveTab('reminders')} className="hover:text-white transition cursor-pointer text-left">Deterministic Rule Advisories</button></li>
+                <li><button onClick={() => setActiveTab('knowledge')} className="hover:text-white transition cursor-pointer text-left">Predefined Crop Encyclopedia</button></li>
+                <li><button onClick={() => setActiveTab('expenses')} className="hover:text-white transition cursor-pointer text-left">Farm Ledger & Cost Analytics</button></li>
               </ul>
             </div>
 
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider mb-3">System Specifications</h4>
-              <div className="bg-emerald-900/60 p-3 rounded-xl border border-emerald-800 text-[11px] text-emerald-200 space-y-1">
-                <div>Architecture: <strong>SPA + Deterministic Logic</strong></div>
-                <div>Palette: <strong>Light Green Lime / Forest Green</strong></div>
-                <div>Status: <strong>P0 Core Features Ready</strong></div>
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-lime-300 uppercase tracking-wider">System Specifications</h4>
+              <div className="bg-emerald-900/60 p-3.5 rounded-xl border border-emerald-800/80 text-[11px] text-emerald-200 space-y-1.5">
+                <div>Architecture: <strong className="text-white font-semibold">SPA + Deterministic Logic</strong></div>
+                <div>Palette: <strong className="text-white font-semibold">Light Green Lime / Forest Green</strong></div>
+                <div>Status: <strong className="text-lime-300 font-semibold">P0 Core Features Ready</strong></div>
               </div>
             </div>
           </div>

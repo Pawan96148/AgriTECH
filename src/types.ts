@@ -142,6 +142,13 @@ export interface WeatherData {
   hourly: HourlyWeather[];
   forecast: DailyForecast[];
   lastUpdated: string;
+  pressure?: number;
+  visibility?: number;
+  sunrise?: string;
+  sunset?: string;
+  tempMin?: number;
+  tempMax?: number;
+  isLiveGPS?: boolean;
 }
 
 export interface CropPresetKnowledge {
@@ -258,7 +265,9 @@ export type ActiveTab =
   | 'profile'
   | 'marketplace'
   | 'orders'
-  | 'sell-produce';
+  | 'sell-produce'
+  | 'community'
+  | 'plant-scanner';
 
 export type ProductUnit = 'kg' | 'quintal' | 'ton' | 'crate' | 'bag';
 
@@ -414,5 +423,62 @@ export interface Order {
 export interface CartItem {
   product: ProductListing;
   quantity: number;
+}
+
+export type CommunityCategory = 
+  | 'Crop Disease'
+  | 'Pest Problem'
+  | 'Weather Alert'
+  | 'Irrigation & Water'
+  | 'Seeds & Fertilizer'
+  | 'Market Prices'
+  | 'Farming Tips'
+  | 'General Discussion';
+
+export interface CommunityComment {
+  id: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  authorRole: string;
+  district: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CommunityPost {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorRole: string;
+  district: string;
+  title: string;
+  content: string;
+  category: CommunityCategory;
+  cropTag?: string;
+  imageUrl?: string;
+  likes: number;
+  likedBy?: string[];
+  commentsCount: number;
+  comments?: CommunityComment[];
+  createdAt: string;
+}
+
+export interface PlantDiagnosisResult {
+  id: string;
+  timestamp: string;
+  cropIdentified: string;
+  healthStatus: string;
+  isHealthy: boolean;
+  confidenceScore: number;
+  severityLevel: 'Healthy' | 'Low' | 'Moderate' | 'High' | 'Severe';
+  symptoms: string[];
+  possibleCauses: string[];
+  organicTreatments: string[];
+  chemicalTreatments: { name: string; dosage: string; application: string }[];
+  preventiveMeasures: string[];
+  expertAdvice: string;
+  disclaimer: string;
+  imageUrl?: string;
 }
 

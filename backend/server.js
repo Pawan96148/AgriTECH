@@ -12,6 +12,8 @@ const produceRoutes = require('./routes/produceRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const farmRoutes = require('./routes/farmRoutes');
 const weatherRoutes = require('./routes/weatherRoutes');
+const communityRoutes = require('./routes/communityRoutes');
+const scannerRoutes = require('./routes/scannerRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,9 +25,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parsers with 25mb limit for camera and plant scan images
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -54,7 +56,10 @@ app.get('/api/health', (req, res) => {
       auth: '/api/auth',
       products: '/api/products',
       orders: '/api/orders',
-      farms: '/api/farms'
+      farms: '/api/farms',
+      weather: '/api/weather',
+      community: '/api/community',
+      scanner: '/api/scanner'
     }
   });
 });
@@ -65,6 +70,8 @@ app.use('/api/products', produceRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/farms', farmRoutes);
 app.use('/api/weather', weatherRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/scanner', scannerRoutes);
 
 // Optional: Serve frontend static build if present in dist
 const distPath = path.resolve(__dirname, '..', 'dist');

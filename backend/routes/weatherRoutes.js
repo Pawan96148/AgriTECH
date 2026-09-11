@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const DEFAULT_CITY = 'Ranchi';
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const WEATHER_API_KEY = (process.env.WEATHER_API_KEY || '').trim();
 
 const getCompassDirection = (degrees = 0) => {
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -17,7 +17,7 @@ const getRainChance = (items = []) => {
   return Math.min(100, Math.round((total / items.length) * 100));
 };
 
-const buildWeatherData = (current, forecast, cityName) => {
+const buildWeatherData = (current, forecast, cityName, isLiveGPS = false) => {
   const upcomingItems = forecast?.list || [];
   const rainChance = getRainChance(upcomingItems);
   const rainVolume = upcomingItems.reduce((sum, item) => {
@@ -71,9 +71,11 @@ const buildWeatherData = (current, forecast, cityName) => {
   const irrigationRecommendation = rainChance >= 65 ? 'SKIP_RAIN_PREDICTED' : (current.main?.temp ?? 28) > 35 ? 'REDUCE' : 'PROCEED';
 
   return {
-    location: `${cityName || current.name}, ${current.sys?.country || 'IN'}`,
+    location: `${cityName || current.name || 'Local Agro Zone'}, ${current.sys?.country || 'IN'}`,
     currentTemp: Math.round(current.main?.temp ?? 0),
     feelsLike: Math.round(current.main?.feels_like ?? 0),
+    tempMin: Math.round(current.main?.temp_min ?? current.main?.temp ?? 0),
+    tempMax: Math.round(current.main?.temp_max ?? current.main?.temp ?? 0),
     humidity,
     rainProbability: rainChance,
     rainfall24hMm: Number(rainVolume.toFixed(1)),
@@ -81,21 +83,26 @@ const buildWeatherData = (current, forecast, cityName) => {
     windDirection: getCompassDirection(current.wind?.deg || 0),
     uvIndex: Math.min(11, Math.max(1, Math.round((current.main?.temp ?? 28) / 6 + 2))),
     soilMoisturePercent: Math.min(100, Math.max(0, Math.round((humidity + rainChance) / 2))),
+    pressure: current.main?.pressure || 1012,
+    visibility: current.visibility ? Math.round(current.visibility / 1000) : 10,
+    sunrise: current.sys?.sunrise ? new Date(current.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '05:45 AM',
+    sunset: current.sys?.sunset ? new Date(current.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '06:15 PM',
     condition: current.weather?.[0]?.description || 'Partly cloudy',
     spraySuitability,
     irrigationRecommendation,
     hourly,
     forecast: uniqueDays.slice(0, 5),
+    isLiveGPS,
     lastUpdated: new Date().toISOString()
   };
 };
-
 
 router.get('/', async (req, res) => {
   const { lat, lon } = req.query;
   let rawCity = (req.query.city || DEFAULT_CITY).toString();
   // If city contains comma like "Ranchi, Jharkhand", extract primary city
   const city = rawCity.split(',')[0].trim();
+  const hasCoordinates = Boolean(lat && lon && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon)));
 
   if (!WEATHER_API_KEY) {
     return res.status(500).json({
@@ -109,7 +116,7 @@ router.get('/', async (req, res) => {
     let forecastUrl;
     let locationLabel = city;
 
-    if (lat && lon && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
+    if (hasCoordinates) {
       currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${WEATHER_API_KEY}&units=metric`;
       forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${WEATHER_API_KEY}&units=metric&cnt=40`;
     } else {
@@ -135,7 +142,7 @@ router.get('/', async (req, res) => {
       forecastResponse.json()
     ]);
 
-    const weather = buildWeatherData(current, forecast, current.name || locationLabel);
+    const weather = buildWeatherData(current, forecast, current.name || locationLabel, hasCoordinates);
 
     return res.json({ success: true, weather });
   } catch (error) {
