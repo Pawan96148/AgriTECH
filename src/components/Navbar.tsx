@@ -138,21 +138,21 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-lime-200/80 shadow-xs">
       {/* Top micro bar for agricultural context */}
-      <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-green-900 text-white text-[11px] sm:text-xs border-b border-emerald-800/60">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-1.5 flex items-center justify-between gap-3 min-w-0">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <span className="flex items-center gap-1.5 font-semibold text-lime-300 shrink-0 text-[11px] sm:text-xs whitespace-nowrap">
-              <span className="inline-block w-2 h-2 rounded-full bg-lime-400 animate-pulse shrink-0"></span>
+      <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-green-900 text-white text-[10px] sm:text-xs border-b border-emerald-800/60">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 py-1.5 flex items-center justify-between gap-1.5 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
+            <span className="flex items-center gap-1 sm:gap-1.5 font-semibold text-lime-300 shrink-0 text-[10px] sm:text-xs whitespace-nowrap">
+              <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-lime-400 animate-pulse shrink-0"></span>
               Engine v1.0
             </span>
             <span className="text-emerald-500/50 select-none shrink-0">•</span>
-            <div className="flex items-center gap-1 min-w-0 max-w-[130px] xs:max-w-[170px] sm:max-w-[220px] md:max-w-none text-emerald-100">
+            <div className="flex items-center gap-1 min-w-0 max-w-[115px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none text-emerald-100">
               <MapPin className="w-3 h-3 text-lime-400 shrink-0" />
               <select 
                 id="header-farm-selector"
                 value={selectedFarm?.id || ''} 
                 onChange={(e) => setSelectedFarmId(e.target.value)}
-                className="bg-emerald-950/70 border border-emerald-600/60 rounded px-1.5 py-0.5 text-[10px] sm:text-xs text-lime-200 focus:outline-none focus:ring-1 focus:ring-lime-400 cursor-pointer w-full truncate"
+                className="bg-emerald-950/70 border border-emerald-600/60 rounded px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs text-lime-200 focus:outline-none focus:ring-1 focus:ring-lime-400 cursor-pointer w-full truncate"
               >
                 {farms.map(f => (
                   <option key={f.id} value={f.id} className="bg-emerald-900 text-white">
@@ -163,7 +163,7 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 ml-auto">
             <div className="hidden sm:flex items-center gap-1 text-emerald-100/90 whitespace-nowrap">
               <CloudSun className="w-3.5 h-3.5 text-lime-300 shrink-0" />
               <span>{weather.currentTemp}°C, {weather.condition}</span>
@@ -186,7 +186,7 @@ export const Navbar: React.FC = () => {
             <button 
               id="header-export-summary-btn"
               onClick={handleExportClick}
-              className="flex items-center gap-1 text-[10px] sm:text-[11px] bg-emerald-700/60 hover:bg-emerald-700 text-lime-200 px-2 py-0.5 rounded transition font-medium cursor-pointer shrink-0"
+              className="flex items-center gap-1 text-[10px] sm:text-[11px] bg-emerald-700/60 hover:bg-emerald-700 text-lime-200 px-1.5 sm:px-2 py-0.5 rounded transition font-medium cursor-pointer shrink-0"
               title="Export Agricultural Report"
             >
               <FileDown className="w-3 h-3 shrink-0" />
@@ -216,8 +216,8 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Main Desktop Navigation - Clean, single set of navigational items */}
-          <nav className="hidden lg:flex items-center space-x-0.5 overflow-x-auto scrollbar-none">
+          {/* Main Desktop Navigation - Clean, single set of navigational items (<768px hidden, >=768px flex) */}
+          <nav className="hidden md:flex items-center space-x-0.5 overflow-x-auto scrollbar-none">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -416,11 +416,11 @@ export const Navbar: React.FC = () => {
               </div>
             )}
 
-            {/* Mobile / Tablet Hamburger Toggle Button */}
+            {/* Mobile / Tablet Hamburger Toggle Button (<768px visible, >=768px hidden) */}
             <button
               id="navbar-mobile-drawer-toggle"
               onClick={() => setIsMobileDrawerOpen(!isMobileDrawerOpen)}
-              className="lg:hidden p-2 rounded-xl bg-lime-100 hover:bg-lime-200 text-emerald-950 border border-lime-300 transition cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="md:hidden p-2 rounded-xl bg-lime-100 hover:bg-lime-200 text-emerald-950 border border-lime-300 transition cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
               aria-label="Toggle Navigation Menu"
             >
               {isMobileDrawerOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -429,9 +429,9 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Full Mobile & Tablet Slide-Over Navigation Drawer */}
+      {/* Full Mobile & Tablet Slide-Over Navigation Drawer (<768px) */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+        <div className="fixed inset-0 z-50 md:hidden flex justify-end">
           {/* Backdrop */}
           <div 
             onClick={() => setIsMobileDrawerOpen(false)} 
@@ -558,6 +558,32 @@ export const Navbar: React.FC = () => {
                 >
                   <CalendarCheck className="w-4 h-4 text-emerald-700" />
                   <span>Field Schedule & Tasks</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('plant-scanner')}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl transition cursor-pointer ${
+                    activeTab === 'plant-scanner' ? 'bg-emerald-800 text-white font-bold' : 'hover:bg-lime-50 text-stone-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Scan className="w-4 h-4 text-emerald-700" />
+                    <span>AI Plant Disease Scanner</span>
+                  </div>
+                  <span className="text-[9px] bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded font-bold">AI</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('community')}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl transition cursor-pointer ${
+                    activeTab === 'community' ? 'bg-emerald-800 text-white font-bold' : 'hover:bg-lime-50 text-stone-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Users className="w-4 h-4 text-emerald-700" />
+                    <span>District Farmer Community</span>
+                  </div>
+                  <span className="text-[9px] bg-lime-100 text-emerald-950 px-1.5 py-0.2 rounded font-bold">24 Dists</span>
                 </button>
               </div>
 

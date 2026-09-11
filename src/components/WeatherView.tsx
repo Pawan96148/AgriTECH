@@ -138,13 +138,13 @@ export const WeatherView: React.FC = () => {
           </button>
 
           {/* Farm Location Switcher */}
-          <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-lime-200 shadow-2xs">
-            <MapPin className="w-3.5 h-3.5 text-emerald-700 ml-1.5" />
+          <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-lime-200 shadow-2xs w-full sm:w-auto">
+            <MapPin className="w-3.5 h-3.5 text-emerald-700 ml-1.5 shrink-0" />
             <select
               id="weather-farm-select"
               value={selectedFarmId}
               onChange={(e) => setSelectedFarmId(e.target.value)}
-              className="bg-stone-50 border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+              className="bg-stone-50 border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700 w-full sm:w-auto max-w-[280px] truncate"
             >
               {farms.map(f => (
                 <option key={f.id} value={f.id}>{f.farmName} ({f.location})</option>

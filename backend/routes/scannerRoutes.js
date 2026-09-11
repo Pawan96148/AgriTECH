@@ -332,6 +332,89 @@ Respond with STRICT JSON ONLY (no markdown formatting, no code blocks, no backti
   }
 }
 
+// Helper: Run Plant.id API v3 if API key is provided
+async function analyzeWithPlantId(imageBase64, cropHint) {
+  const apiKey = (process.env.PLANT_DISEASE_API_KEY || '').trim();
+  const apiUrl = (process.env.PLANT_DISEASE_API_URL || 'https://api.plant.id/v3/identification').trim();
+
+  if (!apiKey || apiKey === 'AIzaSyDcXiJ5GGDIJD0eyMdhFi4C1RsV8a6Ol5Y') {
+    return null;
+  }
+
+  try {
+    const cleanBase64 = imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 9000);
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Api-Key': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        images: [cleanBase64],
+        latitude: 23.4833,
+        longitude: 85.4833,
+        similar_images: true
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      console.warn(`[Scanner] Plant.id API returned status ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    const suggestion = data?.result?.classification?.suggestions?.[0];
+    const diseaseSuggestion = data?.result?.disease?.suggestions?.[0];
+    const isHealthy = Boolean(data?.result?.is_healthy?.binary ?? !diseaseSuggestion);
+
+    if (suggestion) {
+      return {
+        cropIdentified: suggestion.name || (cropHint ? `${cropHint} (Plant.id)` : 'Identified Plant Species'),
+        healthStatus: isHealthy ? 'Vigorous & Healthy Plant Tissue' : (diseaseSuggestion?.name || 'Pathological Foliar Disease'),
+        isHealthy: isHealthy,
+        confidenceScore: Math.round((diseaseSuggestion?.probability || suggestion.probability || 0.88) * 100),
+        severityLevel: isHealthy ? 'Healthy' : (diseaseSuggestion?.probability > 0.7 ? 'High' : 'Moderate'),
+        symptoms: diseaseSuggestion?.details?.description
+          ? [diseaseSuggestion.details.description]
+          : ['Visual leaf tissue changes, chlorotic spotting, or fungal lesions detected by vision model.'],
+        possibleCauses: [
+          'Pathogen infection or environmental stress detected via Plant.id cloud database.',
+          'Atmospheric humidity and foliar moisture conducive to spore germination.'
+        ],
+        organicTreatments: [
+          'Prune and safely isolate any symptomatic leaves.',
+          'Apply 5% Neem Seed Kernel Extract (NSKE) @ 3 ml/L as preventive biopesticide.',
+          'Spray bio-fungicide Trichoderma viride @ 5g/L on affected canopy.'
+        ],
+        chemicalTreatments: [
+          {
+            name: 'Broad-spectrum Protective Fungicide (Mancozeb 75% WP)',
+            dosage: '2.5g per litre of water',
+            application: 'Thorough canopy foliar spray covering undersides of foliage.'
+          }
+        ],
+        preventiveMeasures: [
+          'Maintain field sanitation and remove crop debris after harvest.',
+          'Optimize row spacing for adequate air circulation.',
+          'Adopt drip irrigation to avoid wet foliage.'
+        ],
+        expertAdvice: 'Plant.id Cloud Vision diagnosis. For severe outbreaks across large acreage, consult the nearest Krishi Vigyan Kendra (KVK).',
+        disclaimer: 'AI-assisted diagnosis using Plant.id v3. Verify pesticide application with local agricultural guidelines.'
+      };
+    }
+  } catch (err) {
+    console.warn('[Scanner] Plant.id API call failed:', err.message);
+    return null;
+  }
+  return null;
+}
+
 // Fallback: Agronomic Vision Diagnostic Rule Engine
 function analyzeWithAgronomicEngine(cropHint, sampleTag) {
   const query = `${cropHint || ''} ${sampleTag || ''}`.toLowerCase();
@@ -373,9 +456,12 @@ router.post('/analyze', async (req, res) => {
       }
     }
 
-    // 2. If real image provided and no sampleTag, attempt Gemini analysis
+    // 2. If real image provided and no sampleTag, attempt Plant.id API first, then Gemini
     if (!result && imageBase64) {
-      result = await analyzeWithGemini(imageBase64, cropHint);
+      result = await analyzeWithPlantId(imageBase64, cropHint);
+      if (!result) {
+        result = await analyzeWithGemini(imageBase64, cropHint);
+      }
     }
 
     // 3. Fallback to Agronomic Vision Diagnostic Engine

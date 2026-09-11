@@ -131,20 +131,20 @@ export const DashboardView: React.FC = () => {
           </div>
 
           {/* Weather Snapshot Widget inside banner */}
-          <div className="w-full lg:w-auto lg:min-w-90 bg-emerald-950/40 backdrop-blur-md border border-white/20 rounded-xl p-4 flex flex-col justify-between space-y-3.5 shadow-inner">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-full lg:w-auto lg:min-w-90 bg-emerald-950/40 backdrop-blur-md border border-white/20 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between space-y-3 shadow-inner">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                 <div className="p-2 rounded-lg bg-lime-400/20 border border-lime-400/30 shrink-0">
-                  <CloudSun className="w-6 h-6 text-lime-300" />
+                  <CloudSun className="w-5 h-5 sm:w-6 sm:h-6 text-lime-300" />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-emerald-100 block">Current Farm Weather</span>
+                    <span className="text-[11px] sm:text-xs font-semibold text-emerald-100 block truncate">Current Farm Weather</span>
                     {weatherLoading && (
-                      <RefreshCw className="w-3 h-3 text-lime-300 animate-spin" />
+                      <RefreshCw className="w-3 h-3 text-lime-300 animate-spin shrink-0" />
                     )}
                   </div>
-                  <span className="text-sm font-bold text-white truncate block">
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
                     {weather.farmName ? `${weather.farmName} • ` : ''}{weather.location}
                   </span>
                 </div>
@@ -159,8 +159,8 @@ export const DashboardView: React.FC = () => {
                   <RefreshCw className={`w-3.5 h-3.5 ${weatherLoading ? 'animate-spin' : ''}`} />
                 </button>
                 <div className="text-right">
-                  <span className="text-2xl font-extrabold text-white leading-tight block">{weather.currentTemp}°C</span>
-                  <span className="text-xs font-semibold text-lime-300 block">{weather.condition}</span>
+                  <span className="text-xl sm:text-2xl font-extrabold text-white leading-tight block">{weather.currentTemp}°C</span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-lime-300 block truncate max-w-22.5 sm:max-w-none">{weather.condition}</span>
                 </div>
               </div>
             </div>
@@ -173,39 +173,39 @@ export const DashboardView: React.FC = () => {
             )}
 
             {/* Micro meteorological stats */}
-            <div className="grid grid-cols-3 gap-2 text-center text-xs py-2 border-t border-white/15">
-              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-2 flex flex-col items-center justify-center">
-                <span className="text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Rain Prob</span>
-                <span className={`text-sm font-extrabold ${weather.rainProbability >= 50 ? 'text-amber-300' : 'text-white'}`}>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-xs py-1.5 sm:py-2 border-t border-white/15">
+              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-1.5 sm:p-2 flex flex-col items-center justify-center">
+                <span className="text-[9px] sm:text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Rain Prob</span>
+                <span className={`text-xs sm:text-sm font-extrabold ${weather.rainProbability >= 50 ? 'text-amber-300' : 'text-white'}`}>
                   {weather.rainProbability}%
                 </span>
               </div>
-              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-2 flex flex-col items-center justify-center">
-                <span className="text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Humidity</span>
-                <span className="text-sm font-extrabold text-white">{weather.humidity}%</span>
+              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-1.5 sm:p-2 flex flex-col items-center justify-center">
+                <span className="text-[9px] sm:text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Humidity</span>
+                <span className="text-xs sm:text-sm font-extrabold text-white">{weather.humidity}%</span>
               </div>
-              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-2 flex flex-col items-center justify-center">
-                <span className="text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Wind Speed</span>
-                <span className="text-sm font-extrabold text-white">{weather.windSpeedKmH} km/h</span>
+              <div className="bg-emerald-950/60 border border-emerald-800/60 rounded-lg p-1.5 sm:p-2 flex flex-col items-center justify-center">
+                <span className="text-[9px] sm:text-[10px] uppercase font-semibold text-emerald-200/90 block mb-0.5">Wind Speed</span>
+                <span className="text-xs sm:text-sm font-extrabold text-white">{weather.windSpeedKmH} km/h</span>
               </div>
             </div>
 
             {/* Weather Simulator Quick Switcher - Separated and responsive */}
-            <div className="pt-2 border-t border-white/15 space-y-1.5">
+            <div className="pt-1.5 sm:pt-2 border-t border-white/15 space-y-1.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-lime-300 flex items-center gap-1.5">
+                <span className="font-semibold text-lime-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Test Scenario:</span>
                 </span>
-                <span className="text-[10px] text-emerald-200/80 font-medium">Rule simulation</span>
+                <span className="text-[9px] sm:text-[10px] text-emerald-200/80 font-medium">Rule simulation</span>
               </div>
-              <div className="grid grid-cols-4 gap-1.5 w-full">
+              <div className="grid grid-cols-4 gap-1 sm:gap-1.5 w-full">
                 {(['rainy', 'sunny', 'heatwave', 'windy'] as const).map((s) => (
                   <button
                     key={s}
                     id={`sim-btn-${s}`}
                     onClick={() => handleScenarioChange(s)}
-                    className={`px-1.5 py-1.5 rounded-lg text-xs font-bold transition-all text-center truncate cursor-pointer ${
+                    className={`px-1 py-1 sm:px-1.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all text-center truncate cursor-pointer ${
                       activeWeatherSim === s
                         ? 'bg-lime-400 text-emerald-950 shadow-xs ring-1 ring-lime-300'
                         : 'bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/50 text-emerald-100 hover:text-white'
@@ -221,7 +221,7 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* Metrics Ribbon (PRD Section 14) */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
         {/* Metric 1: Active Farms */}
         <div 
           onClick={() => setActiveTab('farms')}
@@ -305,7 +305,7 @@ export const DashboardView: React.FC = () => {
         {/* Metric 5: Active Rule Advisories */}
         <div 
           onClick={() => setActiveTab('reminders')}
-          className="bg-white p-3.5 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group col-span-2 lg:col-span-1 flex flex-col justify-between h-full"
+          className="bg-white p-3.5 sm:p-4 rounded-xl border border-lime-200 hover:border-lime-400 shadow-xs transition cursor-pointer group col-span-1 sm:col-span-2 md:col-span-1 flex flex-col justify-between h-full"
         >
           <div className="flex items-center justify-between text-stone-500 mb-2">
             <span className="text-xs font-semibold text-emerald-900/80">Active Alerts</span>
@@ -442,9 +442,9 @@ export const DashboardView: React.FC = () => {
                     return (
                       <div
                         key={task.id}
-                        className="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 flex items-start justify-between gap-3"
+                        className="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0 flex-1 wrap-break-word">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-200 text-rose-900 px-2 py-0.5 rounded">
                               {task.activityType}
@@ -465,11 +465,11 @@ export const DashboardView: React.FC = () => {
                         <button
                           id={`complete-task-${task.id}`}
                           onClick={() => updateActivityStatus(task.id, 'COMPLETED')}
-                          className="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                          className="self-end sm:self-center shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
                           title="Mark as Completed"
                         >
                           <Check className="w-4 h-4 stroke-3" />
-                          <span className="hidden sm:inline">Complete</span>
+                          <span>Complete</span>
                         </button>
                       </div>
                     );
@@ -502,9 +502,9 @@ export const DashboardView: React.FC = () => {
                     return (
                       <div
                         key={task.id}
-                        className="bg-lime-50/50 hover:bg-lime-50 border border-lime-200 rounded-xl p-3.5 flex items-start justify-between gap-3 transition"
+                        className="bg-lime-50/50 hover:bg-lime-50 border border-lime-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition"
                       >
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0 flex-1 wrap-break-word">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded border border-emerald-200">
                               {task.activityType}
@@ -525,7 +525,7 @@ export const DashboardView: React.FC = () => {
                         <button
                           id={`complete-task-${task.id}`}
                           onClick={() => updateActivityStatus(task.id, 'COMPLETED')}
-                          className="shrink-0 bg-lime-500 hover:bg-lime-600 text-emerald-950 text-xs font-extrabold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                          className="self-end sm:self-center shrink-0 bg-lime-500 hover:bg-lime-600 text-emerald-950 text-xs font-extrabold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
                           title="Mark Done"
                         >
                           <Check className="w-4 h-4 stroke-3" />

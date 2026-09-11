@@ -189,7 +189,13 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const parsed: User[] = JSON.parse(saved);
       const existingIds = new Set(parsed.map(u => u.id));
       const missingDefaults = DEFAULT_REGISTERED_ACCOUNTS.filter(d => !existingIds.has(d.id));
-      return missingDefaults.length > 0 ? [...parsed, ...missingDefaults] : parsed;
+      const merged = missingDefaults.length > 0 ? [...parsed, ...missingDefaults] : parsed;
+      return merged.map(u => {
+        if (u.id === 'usr_delivery_01' && (u.name === 'Deepak Kumar' || !u.name)) {
+          return { ...u, name: 'Prince Chadda', email: 'prince.delivery@jharkhandagro.in' };
+        }
+        return u;
+      });
     } catch {
       return DEFAULT_REGISTERED_ACCOUNTS;
     }
@@ -197,7 +203,18 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [user, setUser] = useState<User>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}user`);
-    return saved ? JSON.parse(saved) : INITIAL_USER;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.id === 'usr_delivery_01' && parsed.name === 'Deepak Kumar') {
+          return { ...parsed, name: 'Prince Chadda', email: 'prince.delivery@jharkhandagro.in' };
+        }
+        return parsed;
+      } catch {
+        return INITIAL_USER;
+      }
+    }
+    return INITIAL_USER;
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -210,7 +227,36 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [farms, setFarms] = useState<Farm[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`);
-    return saved ? JSON.parse(saved) : INITIAL_FARMS;
+    if (saved) {
+      try {
+        const parsed: Farm[] = JSON.parse(saved);
+        const sanitized = parsed.map(f => {
+          if (f.id === 'farm_02' && (f.farmName.includes('Subarnarekha') || f.location.includes('Namkum'))) {
+            return {
+              ...f,
+              farmName: 'Riverside Organic Acres',
+              location: 'Riverside Plot, Jamshedpur (East Singhbhum)',
+              latitude: 22.8046,
+              longitude: 86.2029
+            };
+          }
+          if (f.location && (f.location.includes('Indore') || f.location.includes('Kandra') || f.location.includes('Kāndra'))) {
+            return { ...f, location: 'Ormanjhi, Ranchi (Jharkhand)', latitude: 23.4833, longitude: 85.4833 };
+          }
+          return f;
+        });
+
+        const hasDhanbad = sanitized.some(f => f.id === 'farm_04');
+        if (!hasDhanbad) {
+          const dhanbadFarm = INITIAL_FARMS.find(f => f.id === 'farm_04');
+          if (dhanbadFarm) sanitized.push(dhanbadFarm);
+        }
+        return sanitized;
+      } catch {
+        return INITIAL_FARMS;
+      }
+    }
+    return INITIAL_FARMS;
   });
 
   const [selectedFarmId, setSelectedFarmId] = useState<string>(() => {
@@ -229,7 +275,18 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [weather, setWeather] = useState<WeatherData>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`);
-    return saved ? JSON.parse(saved) : INITIAL_WEATHER;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.location || parsed.location.includes('Indore') || parsed.location.includes('Kāndra') || parsed.location.includes('Kandra')) {
+          return INITIAL_WEATHER;
+        }
+        return parsed;
+      } catch {
+        return INITIAL_WEATHER;
+      }
+    }
+    return INITIAL_WEATHER;
   });
 
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
@@ -265,34 +322,41 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return registeredAccounts.filter(acc => acc.role === 'DELIVERY_PARTNER');
   }, [registeredAccounts]);
 
-  const fetchLiveWeather = useCallback(async (overrideLat?: number, overrideLon?: number) => {
+  const fetchLiveWeather = useCallback(async (overrideLat?: number, overrideLon?: number, farmOverride?: Farm) => {
     setWeatherLoading(true);
     setWeatherError(null);
+    const activeFarm = farmOverride || selectedFarm;
     try {
       let queryParam = '';
-      const activeLat = overrideLat !== undefined ? overrideLat : userCoordinates?.lat;
-      const activeLon = overrideLon !== undefined ? overrideLon : userCoordinates?.lon;
+      let targetLat = overrideLat;
+      let targetLon = overrideLon;
 
-      if (activeLat !== undefined && activeLon !== undefined) {
-        queryParam = `lat=${activeLat}&lon=${activeLon}`;
-      } else if (selectedFarm?.latitude && selectedFarm?.longitude) {
-        queryParam = `lat=${selectedFarm.latitude}&lon=${selectedFarm.longitude}`;
-      } else if (selectedFarm?.location) {
-        const city = selectedFarm.location.split(',')[0].replace(/\(.*\)/, '').trim();
-        queryParam = `city=${encodeURIComponent(city || 'Ranchi')}`;
-      } else if (user?.region) {
-        const city = user.region.split(',')[0].trim();
-        queryParam = `city=${encodeURIComponent(city || 'Ranchi')}`;
-      } else {
-        queryParam = 'city=Ranchi';
+      if (targetLat === undefined || targetLon === undefined) {
+        if (activeFarm?.latitude && activeFarm?.longitude) {
+          targetLat = Number(activeFarm.latitude);
+          targetLon = Number(activeFarm.longitude);
+        } else if (userCoordinates?.lat && userCoordinates?.lon) {
+          targetLat = userCoordinates.lat;
+          targetLon = userCoordinates.lon;
+        } else {
+          targetLat = 23.4833;
+          targetLon = 85.4833;
+        }
       }
+
+      queryParam = `lat=${targetLat}&lon=${targetLon}`;
 
       const res = await fetch(`http://localhost:5000/api/weather?${queryParam}`);
       if (!res.ok) throw new Error(`Weather fetch failed: ${res.statusText}`);
       const data = await res.json();
       if (data?.success && data?.weather) {
-        setWeather(data.weather);
-        setIsFallbackLocation(!data.weather.isLiveGPS);
+        const enriched: WeatherData = {
+          ...data.weather,
+          farmName: activeFarm?.farmName || 'Green Valley Plot A',
+          location: activeFarm?.location || data.weather.location || 'Ormanjhi, Ranchi (Jharkhand)'
+        };
+        setWeather(enriched);
+        setIsFallbackLocation(!overrideLat && !overrideLon);
         setWeatherError(null);
       } else {
         throw new Error(data?.message || 'Invalid weather response');
@@ -301,20 +365,20 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setWeatherError(err.message || 'Unable to connect to live weather service');
       setWeather(prev => ({
         ...prev,
-        location: selectedFarm?.location || user?.region || 'Ranchi, Jharkhand',
-        farmName: selectedFarm?.farmName || 'Jharkhand Cultivation Plot'
+        location: activeFarm?.location || 'Ormanjhi, Ranchi (Jharkhand)',
+        farmName: activeFarm?.farmName || 'Green Valley Plot A'
       }));
       setIsFallbackLocation(true);
     } finally {
       setWeatherLoading(false);
     }
-  }, [userCoordinates, selectedFarm, user?.region]);
+  }, [userCoordinates, selectedFarm]);
 
   const requestUserLocation = useCallback(async (silent = false): Promise<void> => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
       setLocationPermissionStatus('unavailable');
       setIsFallbackLocation(true);
-      if (!silent) setToastMessage('Geolocation is not supported by your browser. Using profile location.');
+      if (!silent) setToastMessage('Geolocation is not supported by your browser. Using Jharkhand farm plot location.');
       return;
     }
 
@@ -324,16 +388,25 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       navigator.geolocation.getCurrentPosition(
         pos => {
           const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          setUserCoordinates(coords);
-          setLocationPermissionStatus('granted');
-          setIsFallbackLocation(false);
-          try {
-            localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}user_coords`, JSON.stringify(coords));
-          } catch {
-            // benign
+          const isInsideJharkhand = coords.lat >= 21.5 && coords.lat <= 25.5 && coords.lon >= 83.3 && coords.lon <= 88.0;
+
+          if (isInsideJharkhand) {
+            setUserCoordinates(coords);
+            setLocationPermissionStatus('granted');
+            setIsFallbackLocation(false);
+            try {
+              localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}user_coords`, JSON.stringify(coords));
+            } catch {
+              // benign
+            }
+            if (!silent) setToastMessage(`🛰️ Live GPS Location active (${coords.lat.toFixed(2)}°N, ${coords.lon.toFixed(2)}°E)`);
+            fetchLiveWeather(coords.lat, coords.lon);
+          } else {
+            setLocationPermissionStatus('granted');
+            setIsFallbackLocation(true);
+            if (!silent) setToastMessage(`📍 GPS detected (${coords.lat.toFixed(1)}°N, ${coords.lon.toFixed(1)}°E). Synced strictly to ${selectedFarm?.farmName || 'Jharkhand plot'}.`);
+            fetchLiveWeather();
           }
-          if (!silent) setToastMessage(`🛰️ Live GPS Location active (${coords.lat.toFixed(2)}°N, ${coords.lon.toFixed(2)}°E)`);
-          fetchLiveWeather(coords.lat, coords.lon);
           resolve();
         },
         err => {
@@ -342,9 +415,9 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setIsFallbackLocation(true);
           if (!silent) {
             if (err.code === 1) {
-              setToastMessage('GPS location permission denied. Using profile/farm default location.');
+              setToastMessage('GPS location permission denied. Using Jharkhand farm plot location.');
             } else {
-              setToastMessage('GPS signal unavailable. Using profile location.');
+              setToastMessage('GPS signal unavailable. Using Jharkhand farm plot location.');
             }
           }
           fetchLiveWeather();
@@ -353,7 +426,19 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         { timeout: 10000, enableHighAccuracy: true }
       );
     });
-  }, [fetchLiveWeather]);
+  }, [fetchLiveWeather, selectedFarm]);
+
+  // Synchronize weather when selected farm changes
+  const prevFarmIdRef = useRef<string>(selectedFarmId);
+  useEffect(() => {
+    if (prevFarmIdRef.current !== selectedFarmId) {
+      prevFarmIdRef.current = selectedFarmId;
+      const targetFarm = farms.find(f => f.id === selectedFarmId);
+      if (targetFarm) {
+        fetchLiveWeather(undefined, undefined, targetFarm);
+      }
+    }
+  }, [selectedFarmId, fetchLiveWeather, farms]);
 
   // Initial weather load & silent GPS query
   useEffect(() => {
@@ -361,10 +446,15 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       navigator.geolocation.getCurrentPosition(
         pos => {
           const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          setUserCoordinates(coords);
-          setLocationPermissionStatus('granted');
-          setIsFallbackLocation(false);
-          fetchLiveWeather(coords.lat, coords.lon);
+          const isInsideJharkhand = coords.lat >= 21.5 && coords.lat <= 25.5 && coords.lon >= 83.3 && coords.lon <= 88.0;
+          if (isInsideJharkhand) {
+            setUserCoordinates(coords);
+            setLocationPermissionStatus('granted');
+            setIsFallbackLocation(false);
+            fetchLiveWeather(coords.lat, coords.lon);
+          } else {
+            fetchLiveWeather();
+          }
         },
         () => {
           fetchLiveWeather();
@@ -916,9 +1006,13 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Weather Scenarios for Testing Deterministic Rules
   const setWeatherScenario = (scenario: 'rainy' | 'sunny' | 'heatwave' | 'windy' | 'monsoon') => {
+    const activeLoc = selectedFarm?.location || 'Ormanjhi, Ranchi (Jharkhand)';
+    const activeFarmName = selectedFarm?.farmName || 'Green Valley Plot A';
     if (scenario === 'rainy' || scenario === 'monsoon') {
       setWeather({
         ...INITIAL_WEATHER,
+        location: activeLoc,
+        farmName: activeFarmName,
         currentTemp: 26,
         feelsLike: 27,
         humidity: 88,
@@ -933,6 +1027,8 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } else if (scenario === 'sunny') {
       setWeather({
         ...INITIAL_WEATHER,
+        location: activeLoc,
+        farmName: activeFarmName,
         currentTemp: 30,
         feelsLike: 31,
         humidity: 45,
@@ -947,6 +1043,8 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } else if (scenario === 'heatwave') {
       setWeather({
         ...INITIAL_WEATHER,
+        location: activeLoc,
+        farmName: activeFarmName,
         currentTemp: 40,
         feelsLike: 43,
         humidity: 30,
@@ -961,6 +1059,8 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } else if (scenario === 'windy') {
       setWeather({
         ...INITIAL_WEATHER,
+        location: activeLoc,
+        farmName: activeFarmName,
         currentTemp: 28,
         humidity: 50,
         rainProbability: 15,

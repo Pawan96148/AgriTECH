@@ -104,8 +104,8 @@ export const DEFAULT_REGISTERED_ACCOUNTS: User[] = [
   },
   {
     id: 'usr_delivery_01',
-    name: 'Deepak Kumar',
-    email: 'deepak.delivery@jharkhandagro.in',
+    name: 'Prince Chadda',
+    email: 'prince.delivery@jharkhandagro.in',
     phone: '+91 98355 44321',
     password: 'Password@123',
     role: 'DELIVERY_PARTNER',
@@ -147,15 +147,15 @@ export const INITIAL_FARMS: Farm[] = [
   {
     id: 'farm_02',
     userId: 'usr_farmer_01',
-    farmName: 'Subarnarekha Organic Acres',
-    location: 'Namkum, Ranchi (Jharkhand)',
-    latitude: 23.3333,
-    longitude: 85.3833,
+    farmName: 'Riverside Organic Acres',
+    location: 'Riverside Plot, Jamshedpur (East Singhbhum)',
+    latitude: 22.8046,
+    longitude: 86.2029,
     area: 4.2,
     areaUnit: 'Acre',
     soilType: 'Loamy',
     irrigationType: 'Sprinkler',
-    notes: 'Well-drained fertile alluvium loamy plot dedicated to horticulture and high-value vegetables.',
+    notes: 'Well-drained fertile alluvium loamy plot along Subarnarekha River dedicated to vegetables and horticulture in Jamshedpur.',
     createdAt: getRelativeDate(-90)
   },
   {
@@ -169,8 +169,22 @@ export const INITIAL_FARMS: Farm[] = [
     areaUnit: 'Acre',
     soilType: 'Red',
     irrigationType: 'Borewell',
-    notes: 'Terraced slope with red loamy soil, good for pulses and drought-tolerant legumes.',
+    notes: 'Terraced slope with red loamy soil, good for pulses and drought-tolerant legumes in Ramgarh.',
     createdAt: getRelativeDate(-60)
+  },
+  {
+    id: 'farm_04',
+    userId: 'usr_farmer_01',
+    farmName: 'Dhanbad Coal-Belt Agro Valley',
+    location: 'Govindpur, Dhanbad (Jharkhand)',
+    latitude: 23.8343,
+    longitude: 86.5244,
+    area: 3.8,
+    areaUnit: 'Acre',
+    soilType: 'Loamy',
+    irrigationType: 'Borewell',
+    notes: 'High-yield vegetable and mustard production parcel in Dhanbad district.',
+    createdAt: getRelativeDate(-45)
   }
 ];
 
@@ -246,6 +260,20 @@ export const INITIAL_CROPS: Crop[] = [
     healthScore: 96,
     notes: 'Successfully harvested with combine thresher at 12.8% moisture.',
     createdAt: getRelativeDate(-160)
+  },
+  {
+    id: 'crop_06',
+    farmId: 'farm_04',
+    cropName: 'Mustard (Pusa Bold)',
+    variety: 'Certified High-Oil Seed',
+    plantingDate: getRelativeDate(-40),
+    expectedHarvestDate: getRelativeDate(50),
+    stage: 'Vegetative',
+    status: 'ACTIVE',
+    estimatedYieldKg: 4800,
+    healthScore: 94,
+    notes: 'Healthy siliquae development in Govindpur plot. Irrigation scheduled.',
+    createdAt: getRelativeDate(-40)
   }
 ];
 
@@ -406,7 +434,8 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
 ];
 
 export const INITIAL_WEATHER: WeatherData = {
-  location: 'Indore North Sector (M.P.)',
+  farmName: 'Green Valley Plot A',
+  location: 'Ormanjhi, Ranchi (Jharkhand)',
   currentTemp: 29,
   feelsLike: 31,
   humidity: 68,
@@ -715,7 +744,7 @@ export const INITIAL_ORDERS: Order[] = [
       landmark: 'Near Jubilee Park Gate'
     },
     deliveryBoyId: 'usr_delivery_01',
-    deliveryBoyName: 'Deepak Kumar',
+    deliveryBoyName: 'Prince Chadda',
     deliveryBoyPhone: '+91 98355 44321',
     assignedAt: `${getRelativeDate(-2)} 02:30 PM`,
     currentLocation: {
@@ -860,7 +889,7 @@ export const INITIAL_ORDERS: Order[] = [
       landmark: 'Near Jubilee Park Gate'
     },
     deliveryBoyId: 'usr_delivery_01',
-    deliveryBoyName: 'Deepak Kumar',
+    deliveryBoyName: 'Prince Chadda',
     deliveryBoyPhone: '+91 98355 44321',
     assignedAt: `${getRelativeDate(-1)} 02:00 PM`,
     currentLocation: {

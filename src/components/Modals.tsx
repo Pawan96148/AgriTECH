@@ -42,12 +42,12 @@ export const Modals: React.FC = () => {
   // Add Farm State
   // -------------------------------------------------------------
   const [farmName, setFarmName] = useState('');
-  const [location, setLocation] = useState('Indore District (M.P.)');
+  const [location, setLocation] = useState('Ormanjhi, Ranchi (Jharkhand)');
   const [area, setArea] = useState('5.0');
   const [soilType, setSoilType] = useState<SoilType>('Loamy');
   const [irrigationType, setIrrigationType] = useState<'Drip' | 'Sprinkler' | 'Canal / Flood' | 'Rainfed' | 'Borewell'>('Drip');
-  const [latitude, setLatitude] = useState('22.7196');
-  const [longitude, setLongitude] = useState('75.8577');
+  const [latitude, setLatitude] = useState('23.4833');
+  const [longitude, setLongitude] = useState('85.4833');
   const [farmNotes, setFarmNotes] = useState('');
 
   const handleAddFarmSubmit = (e: React.FormEvent) => {

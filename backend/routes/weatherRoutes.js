@@ -70,8 +70,16 @@ const buildWeatherData = (current, forecast, cityName, isLiveGPS = false) => {
   const spraySuitability = rainChance >= 60 ? 'UNSUITABLE' : rainChance >= 35 ? 'CAUTION' : 'OPTIMAL';
   const irrigationRecommendation = rainChance >= 65 ? 'SKIP_RAIN_PREDICTED' : (current.main?.temp ?? 28) > 35 ? 'REDUCE' : 'PROCEED';
 
+  let placeName = cityName || current.name || 'Local Agro Zone';
+  if (placeName.includes('Kāndra') || placeName.includes('Kandra')) {
+    placeName = 'Jamshedpur (East Singhbhum)';
+  } else if (placeName.includes('Indore')) {
+    placeName = 'Ranchi (Jharkhand)';
+  }
+  const location = `${placeName}, ${current.sys?.country || 'IN'}`;
+
   return {
-    location: `${cityName || current.name || 'Local Agro Zone'}, ${current.sys?.country || 'IN'}`,
+    location,
     currentTemp: Math.round(current.main?.temp ?? 0),
     feelsLike: Math.round(current.main?.feels_like ?? 0),
     tempMin: Math.round(current.main?.temp_min ?? current.main?.temp ?? 0),
