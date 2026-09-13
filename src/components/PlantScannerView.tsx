@@ -567,7 +567,7 @@ export const PlantScannerView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Header Banner */}
-      <div className="relative bg-gradient-to-br from-emerald-950 via-emerald-900 to-lime-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden border border-emerald-800">
+      <div className="relative bg-linear-to-br from-emerald-950 via-emerald-900 to-lime-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden border border-emerald-800">
         <div className="absolute top-0 right-0 w-96 h-96 bg-lime-400/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
@@ -644,7 +644,7 @@ export const PlantScannerView: React.FC = () => {
             <div className="flex items-center p-1 bg-stone-100 rounded-xl">
               <button
                 onClick={() => handleModeChange('upload')}
-                className={`min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+                className={`min-h-9 px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
                   inputMode === 'upload'
                     ? 'bg-white text-emerald-950 shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
@@ -655,7 +655,7 @@ export const PlantScannerView: React.FC = () => {
               </button>
               <button
                 onClick={() => handleModeChange('camera')}
-                className={`min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+                className={`min-h-9 px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
                   inputMode === 'camera'
                     ? 'bg-white text-emerald-950 shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
@@ -680,7 +680,7 @@ export const PlantScannerView: React.FC = () => {
                   />
                   <button
                     onClick={handleClearImage}
-                    className="w-10 h-10 min-w-[40px] min-h-[40px] absolute top-3 right-3 p-2 bg-black/70 hover:bg-black text-white rounded-full transition cursor-pointer shadow-lg flex items-center justify-center"
+                    className="w-10 h-10 min-w-10 min-h-10 absolute top-3 right-3 p-2 bg-black/70 hover:bg-black text-white rounded-full transition cursor-pointer shadow-lg flex items-center justify-center"
                     title="Retake Photo"
                   >
                     <X className="w-4 h-4" />
@@ -698,7 +698,7 @@ export const PlantScannerView: React.FC = () => {
                       <p className="text-xs">{cameraError}</p>
                       <button
                         onClick={() => startCamera(cameraFacingMode)}
-                        className="min-h-[38px] px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-100 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
+                        className="min-h-9.5 px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-100 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
                       >
                         Retry Camera
                       </button>
@@ -723,7 +723,7 @@ export const PlantScannerView: React.FC = () => {
                         <button
                           type="button"
                           onClick={toggleCameraFacing}
-                          className="w-12 h-12 min-w-[44px] min-h-[44px] bg-stone-800/80 hover:bg-stone-700 text-white rounded-full backdrop-blur-xs transition active:scale-90 cursor-pointer shadow-md flex items-center justify-center"
+                          className="w-12 h-12 min-w-11 min-h-11 bg-stone-800/80 hover:bg-stone-700 text-white rounded-full backdrop-blur-xs transition active:scale-90 cursor-pointer shadow-md flex items-center justify-center"
                           title="Switch Camera"
                         >
                           <SwitchCamera className="w-5 h-5" />
@@ -731,7 +731,7 @@ export const PlantScannerView: React.FC = () => {
                         <button
                           type="button"
                           onClick={capturePhoto}
-                          className="min-h-[48px] px-6 py-3 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold rounded-full shadow-xl transition transform active:scale-90 cursor-pointer flex items-center gap-2 text-sm"
+                          className="min-h-12 px-6 py-3 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold rounded-full shadow-xl transition transform active:scale-90 cursor-pointer flex items-center gap-2 text-sm"
                         >
                           <Camera className="w-4 h-4" />
                           <span>Capture Photo</span>
@@ -805,7 +805,7 @@ export const PlantScannerView: React.FC = () => {
                   key={sample.tag}
                   type="button"
                   onClick={() => handleSelectSample(sample)}
-                  className={`min-h-[44px] p-2.5 rounded-xl text-left border text-xs transition active:scale-95 cursor-pointer flex flex-col justify-center ${
+                    className={`min-h-11 p-2.5 rounded-xl text-left border text-xs transition active:scale-95 cursor-pointer flex flex-col justify-center ${
                     selectedSampleTag === sample.tag
                       ? 'bg-emerald-900 text-white border-emerald-900 shadow-xs'
                       : 'bg-stone-50 hover:bg-lime-50 text-stone-800 border-stone-200'
@@ -839,7 +839,7 @@ export const PlantScannerView: React.FC = () => {
               type="button"
               onClick={handleAnalyze}
               disabled={isAnalyzing || (!selectedImage && !selectedSampleTag)}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-800 via-emerald-900 to-emerald-950 hover:from-emerald-700 hover:to-emerald-900 text-white rounded-2xl font-extrabold text-sm shadow-lg hover:shadow-xl transition transform active:scale-98 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-linear-to-r from-emerald-800 via-emerald-900 to-emerald-950 hover:from-emerald-700 hover:to-emerald-900 text-white rounded-2xl font-extrabold text-sm shadow-lg hover:shadow-xl transition transform active:scale-98 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isAnalyzing ? (
                 <>
@@ -966,7 +966,7 @@ export const PlantScannerView: React.FC = () => {
               )}
 
               {/* Prevention & KVK Advisory */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-lime-50 to-emerald-50 border border-lime-200 space-y-2 text-xs">
+              <div className="p-4 rounded-2xl bg-linear-to-r from-lime-50 to-emerald-50 border border-lime-200 space-y-2 text-xs">
                 <span className="font-extrabold text-emerald-950 flex items-center gap-1.5">
                   <ShieldAlert className="w-4 h-4 text-emerald-800" />
                   <span>Jharkhand Krishi Vigyan Kendra (KVK) Advisory:</span>

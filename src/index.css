@@ -9,9 +9,15 @@
     overflow-x: hidden;
     touch-action: manipulation;
   }
-  /* Prevent iOS text size adjustment */
-  body {
-    -webkit-text-size-adjust: 100%;
+}
+
+/* Keep the standard property alongside the WebKit implementation emitted by Tailwind. */
+@layer utilities {
+  .line-clamp-1 {
+    line-clamp: 1;
+  }
+  .line-clamp-2 {
+    line-clamp: 2;
   }
 }
 
