@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS for frontend Vite dev server (localhost:3000, localhost:5173, etc.)
 app.use(cors({
-  origin: '*',
+  origin: 'https://agri-tech-lilac.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

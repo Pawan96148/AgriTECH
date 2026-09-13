@@ -8,7 +8,7 @@ mongoose.set('bufferCommands', false);
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
-const mongoURL = (process.env.MONGODB_URL_LOCAL || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/AgriTech').trim();
+const mongoURL = (process.env.MONGODB_URL_LOCAL || process.env.MONGODB_URI ).trim();
 
 let isConnected = false;
 
