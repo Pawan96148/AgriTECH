@@ -61,7 +61,7 @@ export const FarmsView: React.FC = () => {
         <button
           id="add-new-farm-btn"
           onClick={() => setIsAddFarmModalOpen(true)}
-          className="flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
+          className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
         >
           <Plus className="w-4 h-4 text-lime-400 stroke-[3]" />
           <span>Register New Plot</span>
@@ -186,14 +186,14 @@ export const FarmsView: React.FC = () => {
                       setSelectedFarmId(farm.id);
                       setActiveTab('crops');
                     }}
-                    className="bg-emerald-800 hover:bg-emerald-900 text-white font-semibold px-2.5 py-1.5 rounded-lg text-xs transition"
+                    className="min-h-[38px] bg-emerald-800 hover:bg-emerald-900 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition active:scale-95 flex items-center justify-center"
                   >
                     View Field →
                   </button>
 
                   <button
                     onClick={() => setFarmToDelete(farm)}
-                    className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                    className="min-w-[38px] min-h-[38px] p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center justify-center"
                     title="Delete Farm Plot"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -208,7 +208,7 @@ export const FarmsView: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {farmToDelete && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-rose-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-xl border border-rose-200">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
@@ -221,10 +221,10 @@ export const FarmsView: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setFarmToDelete(null)}
-                className="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-lg transition cursor-pointer"
+                className="w-full sm:w-auto min-h-[42px] px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-lg transition cursor-pointer flex items-center justify-center"
               >
                 Cancel
               </button>
@@ -233,7 +233,7 @@ export const FarmsView: React.FC = () => {
                   deleteFarm(farmToDelete.id);
                   setFarmToDelete(null);
                 }}
-                className="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition shadow-xs cursor-pointer"
+                className="w-full sm:w-auto min-h-[42px] px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition shadow-xs cursor-pointer flex items-center justify-center"
               >
                 Yes, Delete Plot & Cascaded Data
               </button>

@@ -292,7 +292,7 @@ export const FarmerCommunityView: React.FC = () => {
           <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               onClick={() => setIsPostModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-300 hover:to-lime-400 text-emerald-950 font-extrabold text-sm shadow-lg hover:shadow-xl transition transform active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-300 hover:to-lime-400 text-emerald-950 font-extrabold text-sm shadow-lg hover:shadow-xl transition transform active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Ask Question / Post Alert</span>
@@ -461,7 +461,7 @@ export const FarmerCommunityView: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleLike(post.id)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                        className={`min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition active:scale-95 cursor-pointer ${
                           isLiked
                             ? 'bg-rose-50 text-rose-600 border border-rose-200'
                             : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
@@ -473,7 +473,7 @@ export const FarmerCommunityView: React.FC = () => {
 
                       <button
                         onClick={() => toggleComments(post.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold bg-lime-50 hover:bg-lime-100 text-emerald-950 border border-lime-200 transition cursor-pointer"
+                        className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold bg-lime-50 hover:bg-lime-100 text-emerald-950 border border-lime-200 transition active:scale-95 cursor-pointer"
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
                         <span>{post.commentsCount || commentsList.length} Responses</span>
@@ -527,12 +527,12 @@ export const FarmerCommunityView: React.FC = () => {
                             if (e.key === 'Enter') handleAddComment(post.id);
                           }}
                           placeholder="Share your agronomic advice or solution..."
-                          className="flex-1 bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                          className="min-h-[38px] flex-1 bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
                         />
                         <button
                           onClick={() => handleAddComment(post.id)}
                           disabled={submittingComment[post.id] || !(commentInputs[post.id] || '').trim()}
-                          className="px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition cursor-pointer disabled:opacity-50 flex items-center gap-1 shrink-0"
+                          className="min-h-[38px] px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-1 shrink-0"
                         >
                           <Send className="w-3 h-3" />
                           <span>Reply</span>
@@ -604,86 +604,88 @@ export const FarmerCommunityView: React.FC = () => {
 
       {/* New Post Modal */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-xl w-full border border-lime-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-white rounded-none sm:rounded-3xl max-w-xl w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] flex flex-col border border-lime-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-emerald-900 to-emerald-950 text-white p-5 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-emerald-900 to-emerald-950 text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="text-lg font-extrabold font-serif">Ask Question or Post Alert</h3>
                 <p className="text-xs text-emerald-200 mt-0.5">Publishing to <strong>{activeDistrict} Farmers Community</strong></p>
               </div>
               <button
                 onClick={() => setIsPostModalOpen(false)}
-                className="p-1.5 rounded-full hover:bg-emerald-800 text-emerald-200 hover:text-white transition cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-emerald-800 text-emerald-200 hover:text-white transition cursor-pointer flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleCreatePost} className="p-6 space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-emerald-950">Discussion Category *</label>
-                <select
-                  value={postCategory}
-                  onChange={e => setPostCategory(e.target.value as CommunityCategory)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
-                >
-                  {CATEGORIES.map(c => (
-                    <option key={c.label} value={c.label}>
-                      {c.icon} {c.label}
-                    </option>
-                  ))}
-                </select>
+            <form onSubmit={handleCreatePost} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-emerald-950">Discussion Category *</label>
+                  <select
+                    value={postCategory}
+                    onChange={e => setPostCategory(e.target.value as CommunityCategory)}
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-xs font-bold text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                  >
+                    {CATEGORIES.map(c => (
+                      <option key={c.label} value={c.label}>
+                        {c.icon} {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-emerald-950">Topic / Question Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={postTitle}
+                    onChange={e => setPostTitle(e.target.value)}
+                    placeholder="e.g. Leaf spot symptoms on tomato crop after rain..."
+                    className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-emerald-950">Crop / Variety Tag (Optional)</label>
+                  <input
+                    type="text"
+                    value={postCropTag}
+                    onChange={e => setPostCropTag(e.target.value)}
+                    placeholder="e.g. Hybrid Tomato, Paddy Swarna, Kufri Potato"
+                    className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-emerald-950">Detailed Query / Information *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={postContent}
+                    onChange={e => setPostContent(e.target.value)}
+                    placeholder="Describe your question, symptoms observed, soil conditions, or market information clearly..."
+                    className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                  ></textarea>
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-emerald-950">Topic / Question Title *</label>
-                <input
-                  type="text"
-                  required
-                  value={postTitle}
-                  onChange={e => setPostTitle(e.target.value)}
-                  placeholder="e.g. Leaf spot symptoms on tomato crop after rain..."
-                  className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-emerald-950">Crop / Variety Tag (Optional)</label>
-                <input
-                  type="text"
-                  value={postCropTag}
-                  onChange={e => setPostCropTag(e.target.value)}
-                  placeholder="e.g. Hybrid Tomato, Paddy Swarna, Kufri Potato"
-                  className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-emerald-950">Detailed Query / Information *</label>
-                <textarea
-                  required
-                  rows={4}
-                  value={postContent}
-                  onChange={e => setPostContent(e.target.value)}
-                  placeholder="Describe your question, symptoms observed, soil conditions, or market information clearly..."
-                  className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-1 focus:ring-emerald-700"
-                ></textarea>
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2.5">
+              <div className="pt-4 border-t border-stone-100 flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 pb-safe">
                 <button
                   type="button"
                   onClick={() => setIsPostModalOpen(false)}
-                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition cursor-pointer"
+                  className="w-full sm:w-auto min-h-[42px] px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingPost}
-                  className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+                  className="w-full sm:w-auto min-h-[42px] px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50 flex items-center justify-center"
                 >
                   {isSubmittingPost ? 'Publishing...' : 'Publish to District Forum'}
                 </button>

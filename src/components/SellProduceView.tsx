@@ -309,8 +309,8 @@ export const SellProduceView: React.FC = () => {
               </div>
             </div>
 
-            {/* Quantity, Unit, Price, Min Order Qty */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-3">
+            {/* Quantity, Unit, Price, Min Order Qty - 2x2 on mobile, 4-col on tablet/desktop */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <div>
                 <label className="block font-semibold text-stone-700 text-[11px] sm:text-xs mb-1">Available Qty *</label>
                 <input
@@ -612,8 +612,8 @@ export const SellProduceView: React.FC = () => {
 
       {/* Edit Listing Modal */}
       {editingItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-md w-full p-4 sm:p-6 border border-lime-300 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 border border-lime-300 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
                 <h3 className="text-base font-bold text-emerald-950 font-serif">
@@ -623,7 +623,8 @@ export const SellProduceView: React.FC = () => {
               </div>
               <button
                 onClick={() => setEditingItem(null)}
-                className="text-stone-400 hover:text-stone-700 text-sm font-bold cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-sm font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close Edit Modal"
               >
                 ✕
               </button>

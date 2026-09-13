@@ -46,19 +46,19 @@ export const FeedbackModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-green-950 text-white p-4 sm:p-6 shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-lime-400 text-emerald-950 flex items-center justify-center font-bold">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-lime-400 text-emerald-950 flex items-center justify-center font-bold shrink-0">
                 <Star className="w-5 h-5 fill-emerald-950 text-emerald-950" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-base font-bold text-white font-serif">Customer Produce Review</h3>
-                <p className="text-xs text-emerald-200">
+                <p className="text-[11px] sm:text-xs text-emerald-200 truncate">
                   Order #{order.id} • Direct from {order.farmerName} ({order.farmerLocation}, JH)
                 </p>
               </div>
@@ -66,7 +66,8 @@ export const FeedbackModal: React.FC = () => {
 
             <button
               onClick={() => setFeedbackOrderId(null)}
-              className="w-8 h-8 rounded-full bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 flex items-center justify-center transition cursor-pointer text-sm font-bold"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 flex items-center justify-center transition cursor-pointer text-sm font-bold active:scale-95 shrink-0 ml-2"
+              aria-label="Close Feedback Modal"
             >
               ✕
             </button>
@@ -98,7 +99,7 @@ export const FeedbackModal: React.FC = () => {
             <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider">
               Overall Experience Rating *
             </label>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -106,10 +107,11 @@ export const FeedbackModal: React.FC = () => {
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => setRating(star)}
-                  className="p-1 transition-transform hover:scale-125 cursor-pointer"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] p-1 flex items-center justify-center transition-transform hover:scale-125 active:scale-95 cursor-pointer rounded-xl hover:bg-lime-50"
+                  aria-label={`Rate ${star} star`}
                 >
                   <Star
-                    className={`w-8 h-8 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 ${
                       (hoverRating || rating) >= star
                         ? 'fill-amber-400 text-amber-400'
                         : 'text-stone-300'

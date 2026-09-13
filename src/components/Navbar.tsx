@@ -135,6 +135,41 @@ export const Navbar: React.FC = () => {
     return allItems;
   }, [user.role, isAuthenticated]);
 
+  // Dynamic Role-Aware Persistent Bottom Navigation Tabs (5 tabs including Menu)
+  const bottomNavItems = useMemo(() => {
+    if (user.role === 'CUSTOMER') {
+      return [
+        { id: 'marketplace' as ActiveTab, label: 'Market', icon: Store, hasCartBadge: true },
+        { id: 'orders' as ActiveTab, label: 'Orders', icon: ShoppingBag, hasOrderBadge: true },
+        { id: 'weather' as ActiveTab, label: 'Weather', icon: CloudSun },
+        { id: 'profile' as ActiveTab, label: 'Account', icon: UserIcon },
+      ];
+    }
+    if (user.role === 'DELIVERY_PARTNER') {
+      return [
+        { id: 'orders' as ActiveTab, label: 'Deliveries', icon: Truck, hasOrderBadge: true },
+        { id: 'marketplace' as ActiveTab, label: 'Market', icon: Store },
+        { id: 'weather' as ActiveTab, label: 'Weather', icon: CloudSun },
+        { id: 'profile' as ActiveTab, label: 'Partner ID', icon: UserIcon },
+      ];
+    }
+    if (user.role === 'DEALER') {
+      return [
+        { id: 'marketplace' as ActiveTab, label: 'Market', icon: Store },
+        { id: 'orders' as ActiveTab, label: 'Orders', icon: ShoppingBag, hasOrderBadge: true },
+        { id: 'weather' as ActiveTab, label: 'Weather', icon: CloudSun },
+        { id: 'profile' as ActiveTab, label: 'Dealer ID', icon: UserIcon },
+      ];
+    }
+    // Default FARM_OWNER
+    return [
+      { id: 'dashboard' as ActiveTab, label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'marketplace' as ActiveTab, label: 'Market', icon: Store, hasCartBadge: true },
+      { id: 'sell-produce' as ActiveTab, label: 'Sell', icon: Sparkles },
+      { id: 'orders' as ActiveTab, label: 'Orders', icon: ShoppingBag, hasOrderBadge: true },
+    ];
+  }, [user.role]);
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-lime-200/80 shadow-xs">
       {/* Top micro bar for agricultural context */}
@@ -146,13 +181,13 @@ export const Navbar: React.FC = () => {
               Engine v1.0
             </span>
             <span className="text-emerald-500/50 select-none shrink-0">•</span>
-            <div className="flex items-center gap-1 min-w-0 max-w-[115px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none text-emerald-100">
+            <div className="flex items-center gap-1 min-w-0 max-w-[130px] sm:max-w-[240px] md:max-w-none text-emerald-100">
               <MapPin className="w-3 h-3 text-lime-400 shrink-0" />
               <select 
                 id="header-farm-selector"
                 value={selectedFarm?.id || ''} 
                 onChange={(e) => setSelectedFarmId(e.target.value)}
-                className="bg-emerald-950/70 border border-emerald-600/60 rounded px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs text-lime-200 focus:outline-none focus:ring-1 focus:ring-lime-400 cursor-pointer w-full truncate"
+                className="bg-emerald-950/70 border border-emerald-600/60 rounded px-1 sm:px-1.5 py-1 text-[10px] sm:text-xs text-lime-200 focus:outline-none focus:ring-1 focus:ring-lime-400 cursor-pointer w-full truncate min-h-[26px]"
               >
                 {farms.map(f => (
                   <option key={f.id} value={f.id} className="bg-emerald-900 text-white">
@@ -420,10 +455,10 @@ export const Navbar: React.FC = () => {
             <button
               id="navbar-mobile-drawer-toggle"
               onClick={() => setIsMobileDrawerOpen(!isMobileDrawerOpen)}
-              className="md:hidden p-2 rounded-xl bg-lime-100 hover:bg-lime-200 text-emerald-950 border border-lime-300 transition cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="md:hidden p-2 rounded-xl bg-lime-100 hover:bg-lime-200 text-emerald-950 border border-lime-300 transition cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-95"
               aria-label="Toggle Navigation Menu"
             >
-              {isMobileDrawerOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
+              {isMobileDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -455,7 +490,7 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => setIsMobileDrawerOpen(false)}
-                className="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-900 transition cursor-pointer"
+                className="w-10 h-10 rounded-xl text-emerald-200 hover:text-white hover:bg-emerald-900 transition cursor-pointer flex items-center justify-center active:scale-95"
                 aria-label="Close Navigation"
               >
                 <X className="w-5 h-5" />
@@ -707,65 +742,51 @@ export const Navbar: React.FC = () => {
       )}
 
       {/* Mobile Persistent Bottom Navigation Bar (Visible on phones & small tablets < md) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-lime-200/90 shadow-lg px-2 py-1.5 flex items-center justify-around">
-        <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer ${
-            activeTab === 'dashboard' ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
-          }`}
-        >
-          <LayoutDashboard className={`w-5 h-5 ${activeTab === 'dashboard' ? 'text-emerald-700 stroke-[2.5]' : 'text-stone-400'}`} />
-          <span className="text-[10px] mt-0.5 leading-none">Dashboard</span>
-        </button>
+      <nav 
+        aria-label="Mobile Bottom Navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-lime-200/90 shadow-lg px-1.5 py-1 flex items-center justify-around"
+        style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+        {bottomNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              id={`mobile-bottom-${item.id}`}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex-1 min-h-[48px] min-w-[44px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition cursor-pointer relative active:scale-95 ${
+                isActive ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
+              }`}
+            >
+              <Icon className={`w-5 h-5 transition-transform ${isActive ? 'text-emerald-700 stroke-[2.5] scale-110' : 'text-stone-400'}`} />
+              <span className={`text-[10px] mt-0.5 leading-none transition-colors ${isActive ? 'text-emerald-900 font-bold' : 'text-stone-500'}`}>
+                {item.label}
+              </span>
+              {item.hasCartBadge && cartCount > 0 && (
+                <span className="absolute top-1 right-3 w-2 h-2 rounded-full bg-lime-500 ring-2 ring-white animate-pulse"></span>
+              )}
+              {item.hasOrderBadge && orders.length > 0 && (
+                <span className="absolute top-0.5 right-2 bg-emerald-800 text-white text-[9px] font-bold min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center">
+                  {orders.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
 
+        {/* 5th Tab: Mobile Drawer Menu Toggle */}
         <button
-          onClick={() => setActiveTab('marketplace')}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer relative ${
-            activeTab === 'marketplace' ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
-          }`}
-        >
-          <Store className={`w-5 h-5 ${activeTab === 'marketplace' ? 'text-emerald-700 stroke-[2.5]' : 'text-stone-400'}`} />
-          <span className="text-[10px] mt-0.5 leading-none">Market</span>
-          {cartCount > 0 && (
-            <span className="absolute top-0 right-1 w-2 h-2 rounded-full bg-lime-500 ring-2 ring-white animate-pulse"></span>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('sell-produce')}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer ${
-            activeTab === 'sell-produce' ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
-          }`}
-        >
-          <Sparkles className={`w-5 h-5 ${activeTab === 'sell-produce' ? 'text-emerald-700 stroke-[2.5]' : 'text-stone-400'}`} />
-          <span className="text-[10px] mt-0.5 leading-none">Sell</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer relative ${
-            activeTab === 'orders' ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
-          }`}
-        >
-          <ShoppingBag className={`w-5 h-5 ${activeTab === 'orders' ? 'text-emerald-700 stroke-[2.5]' : 'text-stone-400'}`} />
-          <span className="text-[10px] mt-0.5 leading-none">Orders</span>
-          {orders.length > 0 && (
-            <span className="absolute top-0 right-1 bg-emerald-800 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              {orders.length}
-            </span>
-          )}
-        </button>
-
-        <button
+          id="mobile-bottom-menu"
           onClick={() => setIsMobileDrawerOpen(true)}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer ${
+          className={`flex-1 min-h-[48px] min-w-[44px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition cursor-pointer active:scale-95 ${
             isMobileDrawerOpen ? 'text-emerald-900 font-extrabold' : 'text-stone-500 hover:text-emerald-800'
           }`}
         >
-          <Menu className="w-5 h-5 text-stone-500" />
+          <Menu className={`w-5 h-5 transition-transform ${isMobileDrawerOpen ? 'text-emerald-700 stroke-[2.5] scale-110' : 'text-stone-500'}`} />
           <span className="text-[10px] mt-0.5 leading-none">Menu</span>
         </button>
-      </div>
+      </nav>
 
     </header>
   );

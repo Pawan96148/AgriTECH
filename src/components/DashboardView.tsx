@@ -205,9 +205,9 @@ export const DashboardView: React.FC = () => {
                     key={s}
                     id={`sim-btn-${s}`}
                     onClick={() => handleScenarioChange(s)}
-                    className={`px-1 py-1 sm:px-1.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all text-center truncate cursor-pointer ${
+                    className={`min-h-[36px] px-1 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all text-center truncate cursor-pointer active:scale-95 flex items-center justify-center ${
                       activeWeatherSim === s
-                        ? 'bg-lime-400 text-emerald-950 shadow-xs ring-1 ring-lime-300'
+                        ? 'bg-lime-400 text-emerald-950 shadow-xs ring-1 ring-lime-300 font-extrabold'
                         : 'bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/50 text-emerald-100 hover:text-white'
                     }`}
                   >

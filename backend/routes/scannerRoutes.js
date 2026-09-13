@@ -337,7 +337,7 @@ async function analyzeWithPlantId(imageBase64, cropHint) {
   const apiKey = (process.env.PLANT_DISEASE_API_KEY || '').trim();
   const apiUrl = (process.env.PLANT_DISEASE_API_URL || 'https://api.plant.id/v3/identification').trim();
 
-  if (!apiKey || apiKey === 'AIzaSyDcXiJ5GGDIJD0eyMdhFi4C1RsV8a6Ol5Y') {
+  if (!apiKey || apiKey === 'YOUR_PLANT_ID_API_KEY') {
     return null;
   }
 

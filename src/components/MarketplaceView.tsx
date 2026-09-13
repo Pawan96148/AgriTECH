@@ -400,24 +400,27 @@ export const MarketplaceView: React.FC = () => {
                                 <button
                                   onClick={() => handleQtyChange(prod.id, -1, prod.availableQuantity, minQty)}
                                   disabled={qty <= minQty}
-                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs"
+                                  className="w-9 h-8 sm:w-8 sm:h-7 flex items-center justify-center text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs active:scale-95"
+                                  aria-label="Decrease quantity"
                                 >
-                                  <Minus className="w-3 h-3" />
+                                  <Minus className="w-3.5 h-3.5" />
                                 </button>
-                                <span className="px-2 font-mono font-bold text-xs text-stone-900">{qty}</span>
+                                <span className="px-2 font-mono font-bold text-xs text-stone-900 min-w-[28px] text-center">{qty}</span>
                                 <button
                                   onClick={() => handleQtyChange(prod.id, 1, prod.availableQuantity, minQty)}
                                   disabled={qty >= prod.availableQuantity}
-                                  className="px-2 py-1 text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs"
+                                  className="w-9 h-8 sm:w-8 sm:h-7 flex items-center justify-center text-stone-600 hover:text-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-xs active:scale-95"
+                                  aria-label="Increase quantity"
                                 >
-                                  <Plus className="w-3 h-3" />
+                                  <Plus className="w-3.5 h-3.5" />
                                 </button>
                               </div>
 
                               <button
                                 onClick={() => setActiveDetailProduct(prod)}
-                                className="p-1.5 text-stone-400 hover:text-emerald-800 hover:bg-lime-50 rounded-lg transition cursor-pointer ml-auto"
+                                className="w-9 h-8 sm:w-8 sm:h-7 p-1 text-stone-400 hover:text-emerald-800 hover:bg-lime-50 rounded-lg transition cursor-pointer ml-auto flex items-center justify-center active:scale-95"
                                 title="View details and farmer reviews"
+                                aria-label="View product details"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -426,18 +429,18 @@ export const MarketplaceView: React.FC = () => {
                             <div className="grid grid-cols-2 gap-2">
                               <button
                                 onClick={() => addToCart(prod, qty)}
-                                className="w-full py-2 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold text-xs rounded-xl border border-lime-300 transition flex items-center justify-center gap-1 cursor-pointer"
+                                className="w-full min-h-[38px] py-2 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold text-xs rounded-xl border border-lime-300 transition flex items-center justify-center gap-1 cursor-pointer active:scale-98"
                               >
-                                <ShoppingBag className="w-3.5 h-3.5 text-emerald-800" />
+                                <ShoppingBag className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
                                 <span>Add to Cart</span>
                               </button>
 
                               <button
                                 onClick={() => handleBuyNow(prod)}
-                                className="w-full py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                                className="w-full min-h-[38px] py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer active:scale-98"
                               >
                                 <span>Buy Now</span>
-                                <ArrowRight className="w-3 h-3 text-lime-300" />
+                                <ArrowRight className="w-3.5 h-3.5 text-lime-300 shrink-0" />
                               </button>
                             </div>
                           </>
@@ -497,11 +500,11 @@ export const MarketplaceView: React.FC = () => {
 
       {/* Product Details Modal */}
       {activeDetailProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-lime-300 my-auto animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-lime-300 my-auto animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh]">
             
             {/* Modal Header Image */}
-            <div className="relative aspect-16/9 bg-stone-100 overflow-hidden">
+            <div className="relative aspect-16/9 bg-stone-100 overflow-hidden shrink-0">
               <img
                 src={activeDetailProduct.imageUrl}
                 alt={activeDetailProduct.cropName}
@@ -511,7 +514,8 @@ export const MarketplaceView: React.FC = () => {
               
               <button
                 onClick={() => setActiveDetailProduct(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition cursor-pointer text-sm font-bold"
+                className="absolute top-3 right-3 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition cursor-pointer text-sm font-bold active:scale-95 z-10"
+                aria-label="Close product details"
               >
                 ✕
               </button>
@@ -605,21 +609,21 @@ export const MarketplaceView: React.FC = () => {
             </div>
 
             {/* Modal Footer Actions */}
-            <div className="p-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between gap-3">
+            <div className="p-3 sm:p-4 bg-stone-50 border-t border-stone-200 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 shrink-0">
               <button
                 onClick={() => setActiveDetailProduct(null)}
-                className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold text-xs rounded-xl cursor-pointer"
+                className="w-full sm:w-auto min-h-[40px] px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold text-xs rounded-xl cursor-pointer active:scale-98 flex items-center justify-center"
               >
                 Close
               </button>
 
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => {
                     addToCart(activeDetailProduct, activeDetailProduct.minimumOrderQuantity || 5);
                     setActiveDetailProduct(null);
                   }}
-                  className="px-4 py-2 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold text-xs rounded-xl border border-lime-300 cursor-pointer"
+                  className="w-full sm:w-auto min-h-[40px] px-4 py-2 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold text-xs rounded-xl border border-lime-300 cursor-pointer active:scale-98 flex items-center justify-center"
                 >
                   Add to Cart
                 </button>
@@ -629,7 +633,7 @@ export const MarketplaceView: React.FC = () => {
                     handleBuyNow(activeDetailProduct);
                     setActiveDetailProduct(null);
                   }}
-                  className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
+                  className="w-full sm:w-auto min-h-[40px] px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1 cursor-pointer active:scale-98"
                 >
                   <span>Buy Directly</span>
                   <ArrowRight className="w-3.5 h-3.5 text-lime-300" />

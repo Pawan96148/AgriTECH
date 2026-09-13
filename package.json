@@ -10,7 +10,8 @@
     "server": "node backend/server.js",
     "dev:server": "nodemon backend/server.js",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "seed": "node backend/seedMockData.js"
   },
   "dependencies": {
     "@google/genai": "^2.21.0",

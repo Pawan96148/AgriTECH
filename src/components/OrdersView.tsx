@@ -148,55 +148,55 @@ export const OrdersView: React.FC = () => {
 
       {/* Role / Perspective Switcher Bar */}
       <div className="bg-white rounded-2xl p-3 border border-lime-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-          <span className="text-xs font-bold text-stone-500 mr-2 hidden md:inline">Viewing as:</span>
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 w-full sm:w-auto">
+          <span className="text-xs font-bold text-stone-500 mr-2 hidden md:inline col-span-2 sm:col-span-1">Viewing as:</span>
           
           <button
             onClick={() => setViewMode('CUSTOMER')}
-            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 text-center ${
               viewMode === 'CUSTOMER'
                 ? 'bg-emerald-800 text-white shadow-xs'
                 : 'bg-stone-100 hover:bg-lime-50 text-stone-700 hover:text-emerald-950'
             }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Customer: My Orders</span>
+            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Customer: Orders</span>
           </button>
 
           <button
             onClick={() => setViewMode('FARMER')}
-            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 text-center ${
               viewMode === 'FARMER'
                 ? 'bg-emerald-800 text-white shadow-xs'
                 : 'bg-stone-100 hover:bg-lime-50 text-stone-700 hover:text-emerald-950'
             }`}
           >
-            <Truck className="w-3.5 h-3.5" />
-            <span>Farmer: Incoming Orders</span>
+            <Truck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Farmer: Dispatch</span>
           </button>
 
           <button
             onClick={() => setViewMode('DEALER')}
-            className={`flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 text-center ${
               viewMode === 'DEALER'
                 ? 'bg-amber-800 text-white shadow-xs'
                 : 'bg-stone-100 hover:bg-amber-50 text-stone-700 hover:text-amber-950'
             }`}
           >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Dealer Network</span>
+            <Building2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Dealer Network</span>
           </button>
 
           <button
             onClick={() => setViewMode('DELIVERY_PARTNER')}
-            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 text-center ${
               viewMode === 'DELIVERY_PARTNER'
                 ? 'bg-emerald-800 text-white shadow-xs'
                 : 'bg-stone-100 hover:bg-lime-50 text-stone-700 hover:text-emerald-950'
             }`}
           >
-            <Truck className="w-3.5 h-3.5" />
-            <span>Delivery Partner: Deliveries</span>
+            <Truck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Delivery Partner</span>
           </button>
         </div>
 
@@ -553,13 +553,13 @@ export const OrdersView: React.FC = () => {
                                     startLocationSharing(order.id);
                                   }
                                 }}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                                className={`w-full sm:w-auto min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 ${
                                   isSharingLocation && activeSharingOrderId === order.id
-                                    ? 'bg-lime-400 text-emerald-950 hover:bg-lime-300 animate-pulse'
+                                    ? 'bg-lime-400 text-emerald-950 hover:bg-lime-300 animate-pulse font-extrabold'
                                     : 'bg-emerald-800 hover:bg-emerald-700 text-lime-200 border border-emerald-600'
                                 }`}
                               >
-                                <span className={`w-2 h-2 rounded-full ${isSharingLocation && activeSharingOrderId === order.id ? 'bg-emerald-950' : 'bg-lime-400 animate-ping'}`}></span>
+                                <span className={`w-2.5 h-2.5 rounded-full ${isSharingLocation && activeSharingOrderId === order.id ? 'bg-emerald-950' : 'bg-lime-400 animate-ping'}`}></span>
                                 <span>{isSharingLocation && activeSharingOrderId === order.id ? 'Broadcasting Live GPS (Active)' : 'Broadcast Live GPS Location'}</span>
                               </button>
                             )}
@@ -570,7 +570,7 @@ export const OrdersView: React.FC = () => {
                             {order.deliveryStatus === 'DELIVERY_BOY_ASSIGNED' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'PICKED_UP', 'Picked up from cultivator farm')}
-                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
+                                className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center justify-center"
                               >
                                 Mark as Picked Up
                               </button>
@@ -579,7 +579,7 @@ export const OrdersView: React.FC = () => {
                             {order.deliveryStatus === 'PICKED_UP' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'IN_TRANSIT', 'Moving along Jharkhand highway route')}
-                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
+                                className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center justify-center"
                               >
                                 Mark In Transit
                               </button>
@@ -588,7 +588,7 @@ export const OrdersView: React.FC = () => {
                             {order.deliveryStatus === 'IN_TRANSIT' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'OUT_FOR_DELIVERY', 'Dispatched to customer local area')}
-                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
+                                className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center justify-center"
                               >
                                 Mark Out for Delivery
                               </button>
@@ -597,7 +597,7 @@ export const OrdersView: React.FC = () => {
                             {order.deliveryStatus === 'OUT_FOR_DELIVERY' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'DELIVERED', 'Delivered fresh produce to customer doorstep')}
-                                className="px-3.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs"
+                                className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-xs active:scale-95 flex items-center justify-center"
                               >
                                 Mark as Delivered
                               </button>

@@ -644,7 +644,7 @@ export const PlantScannerView: React.FC = () => {
             <div className="flex items-center p-1 bg-stone-100 rounded-xl">
               <button
                 onClick={() => handleModeChange('upload')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
                   inputMode === 'upload'
                     ? 'bg-white text-emerald-950 shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
@@ -655,7 +655,7 @@ export const PlantScannerView: React.FC = () => {
               </button>
               <button
                 onClick={() => handleModeChange('camera')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer ${
                   inputMode === 'camera'
                     ? 'bg-white text-emerald-950 shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
@@ -680,7 +680,7 @@ export const PlantScannerView: React.FC = () => {
                   />
                   <button
                     onClick={handleClearImage}
-                    className="absolute top-3 right-3 p-2 bg-black/70 hover:bg-black text-white rounded-full transition cursor-pointer shadow-lg"
+                    className="w-10 h-10 min-w-[40px] min-h-[40px] absolute top-3 right-3 p-2 bg-black/70 hover:bg-black text-white rounded-full transition cursor-pointer shadow-lg flex items-center justify-center"
                     title="Retake Photo"
                   >
                     <X className="w-4 h-4" />
@@ -698,7 +698,7 @@ export const PlantScannerView: React.FC = () => {
                       <p className="text-xs">{cameraError}</p>
                       <button
                         onClick={() => startCamera(cameraFacingMode)}
-                        className="px-3 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-100 rounded-xl text-xs font-bold transition cursor-pointer"
+                        className="min-h-[38px] px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-100 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
                       >
                         Retry Camera
                       </button>
@@ -723,7 +723,7 @@ export const PlantScannerView: React.FC = () => {
                         <button
                           type="button"
                           onClick={toggleCameraFacing}
-                          className="p-3 bg-stone-800/80 hover:bg-stone-700 text-white rounded-full backdrop-blur-xs transition cursor-pointer shadow-md"
+                          className="w-12 h-12 min-w-[44px] min-h-[44px] bg-stone-800/80 hover:bg-stone-700 text-white rounded-full backdrop-blur-xs transition active:scale-90 cursor-pointer shadow-md flex items-center justify-center"
                           title="Switch Camera"
                         >
                           <SwitchCamera className="w-5 h-5" />
@@ -731,7 +731,7 @@ export const PlantScannerView: React.FC = () => {
                         <button
                           type="button"
                           onClick={capturePhoto}
-                          className="px-6 py-3 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold rounded-full shadow-xl transition transform active:scale-90 cursor-pointer flex items-center gap-2 text-sm"
+                          className="min-h-[48px] px-6 py-3 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold rounded-full shadow-xl transition transform active:scale-90 cursor-pointer flex items-center gap-2 text-sm"
                         >
                           <Camera className="w-4 h-4" />
                           <span>Capture Photo</span>
@@ -805,7 +805,7 @@ export const PlantScannerView: React.FC = () => {
                   key={sample.tag}
                   type="button"
                   onClick={() => handleSelectSample(sample)}
-                  className={`p-2 rounded-xl text-left border text-xs transition cursor-pointer ${
+                  className={`min-h-[44px] p-2.5 rounded-xl text-left border text-xs transition active:scale-95 cursor-pointer flex flex-col justify-center ${
                     selectedSampleTag === sample.tag
                       ? 'bg-emerald-900 text-white border-emerald-900 shadow-xs'
                       : 'bg-stone-50 hover:bg-lime-50 text-stone-800 border-stone-200'

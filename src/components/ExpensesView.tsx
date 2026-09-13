@@ -148,7 +148,7 @@ export const ExpensesView: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[600px] text-left text-xs">
             <thead className="bg-stone-50 text-stone-600 font-bold border-b border-stone-200">
               <tr>
                 <th className="py-3 px-4">Date</th>
@@ -181,8 +181,9 @@ export const ExpensesView: React.FC = () => {
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => deleteExpense(exp.id)}
-                        className="p-1 text-stone-400 hover:text-rose-600 rounded transition cursor-pointer"
+                        className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg transition cursor-pointer"
                         title="Delete expense"
+                        aria-label="Delete expense"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -197,11 +198,17 @@ export const ExpensesView: React.FC = () => {
 
       {/* Add Expense Modal */}
       {isAddExpenseOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-lime-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <h3 className="text-base font-bold text-emerald-950">Log Field Expense</h3>
-              <button onClick={() => setIsAddExpenseOpen(false)} className="text-stone-400 hover:text-stone-700 text-lg font-bold">✕</button>
+              <button
+                onClick={() => setIsAddExpenseOpen(false)}
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-base font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
             </div>
 
             <form onSubmit={handleAddExpenseSubmit} className="space-y-3 text-xs">

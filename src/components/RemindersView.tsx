@@ -87,7 +87,7 @@ export const RemindersView: React.FC = () => {
         <button
           id="mark-all-read-btn"
           onClick={markAllRemindersAsRead}
-          className="flex items-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-bold px-4 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer"
+          className="w-full sm:w-auto min-h-[42px] flex items-center justify-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-bold px-4 py-2 rounded-xl border border-lime-300 shadow-xs transition active:scale-95 text-xs cursor-pointer"
         >
           <CheckCheck className="w-4 h-4 text-emerald-700" />
           <span>Mark All as Read</span>
@@ -96,12 +96,12 @@ export const RemindersView: React.FC = () => {
 
       {/* Filter Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-lime-200 shadow-2xs">
-        <div className="flex items-center space-x-1 overflow-x-auto">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
           {(['ALL', 'UNREAD', 'READ'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setFilterRead(tab)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition capitalize ${
+              className={`min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition capitalize shrink-0 active:scale-95 ${
                 filterRead === tab
                   ? 'bg-emerald-800 text-white shadow-xs'
                   : 'text-stone-600 hover:text-emerald-950 hover:bg-lime-50'
@@ -117,7 +117,7 @@ export const RemindersView: React.FC = () => {
           <select
             value={filterPriority}
             onChange={(e) => setFilterPriority(e.target.value)}
-            className="bg-stone-50 border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+            className="min-h-[38px] bg-stone-50 border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
           >
             <option value="ALL">All Priorities</option>
             <option value="CRITICAL">🔴 Critical Priority</option>
@@ -199,7 +199,7 @@ export const RemindersView: React.FC = () => {
                         updateActivityStatus(linkedActivity.id, 'COMPLETED');
                         markReminderAsRead(rem.id);
                       }}
-                      className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow-xs cursor-pointer"
+                      className="min-h-[38px] bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow-xs active:scale-95 cursor-pointer flex items-center justify-center"
                     >
                       Complete Task
                     </button>
@@ -208,7 +208,7 @@ export const RemindersView: React.FC = () => {
                   {!rem.isRead ? (
                     <button
                       onClick={() => markReminderAsRead(rem.id)}
-                      className="bg-white hover:bg-lime-50 text-emerald-900 font-semibold px-3 py-1.5 rounded-lg text-xs border border-lime-300 transition cursor-pointer"
+                      className="min-h-[38px] bg-white hover:bg-lime-50 text-emerald-900 font-semibold px-3 py-1.5 rounded-lg text-xs border border-lime-300 transition active:scale-95 cursor-pointer flex items-center justify-center"
                     >
                       Mark Read
                     </button>

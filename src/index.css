@@ -9,6 +9,10 @@
     overflow-x: hidden;
     touch-action: manipulation;
   }
+  /* Prevent iOS text size adjustment */
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
 }
 
 /* Custom smooth scrollbar that doesn't push layout on mobile */
@@ -24,3 +28,12 @@
     scrollbar-width: none;
   }
 }
+
+/* Safe area padding utilities for mobile devices with notches / home indicators */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+

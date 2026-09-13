@@ -206,31 +206,31 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] overflow-hidden shadow-2xl border border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-200 flex flex-col">
         
         {/* Header with Agro Branding */}
-        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-900 text-white p-5 sm:p-6 relative">
+        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-900 text-white p-4 sm:p-6 relative shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-lime-400/20 text-lime-300 border border-lime-400/40 flex items-center justify-center shadow-inner">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-lime-400/20 text-lime-300 border border-lime-400/40 flex items-center justify-center shadow-inner shrink-0">
                 <Sprout className="w-6 h-6 text-lime-400" />
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="font-extrabold text-base tracking-tight font-serif text-white">AGRITECH</span>
                   <span className="text-[10px] bg-lime-400/30 text-lime-200 px-2 py-0.2 rounded-full font-mono border border-lime-300/30">
                     FARM AUTH
                   </span>
                 </div>
-                <p className="text-xs text-emerald-200">Smart Monitoring & Intelligent Farming</p>
+                <p className="text-[11px] sm:text-xs text-emerald-200 truncate">Smart Monitoring & Intelligent Farming</p>
               </div>
             </div>
             
             <button
               id="auth-modal-close-btn"
               onClick={closeAuthModal}
-              className="w-8 h-8 rounded-full bg-emerald-950/60 hover:bg-emerald-950 text-emerald-200 hover:text-white flex items-center justify-center transition cursor-pointer text-sm font-bold"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-emerald-950/60 hover:bg-emerald-950 text-emerald-200 hover:text-white flex items-center justify-center transition cursor-pointer text-sm font-bold active:scale-95 shrink-0 ml-2"
               aria-label="Close authentication modal"
             >
               ✕

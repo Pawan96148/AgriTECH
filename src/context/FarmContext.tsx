@@ -230,6 +230,7 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (saved) {
       try {
         const parsed: Farm[] = JSON.parse(saved);
+        if (!Array.isArray(parsed) || parsed.length === 0) return INITIAL_FARMS;
         const sanitized = parsed.map(f => {
           if (f.id === 'farm_02' && (f.farmName.includes('Subarnarekha') || f.location.includes('Namkum'))) {
             return {
@@ -265,12 +266,24 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [crops, setCrops] = useState<Crop[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`);
-    return saved ? JSON.parse(saved) : INITIAL_CROPS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return INITIAL_CROPS;
   });
 
   const [activities, setActivities] = useState<Activity[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}activities`);
-    return saved ? JSON.parse(saved) : INITIAL_ACTIVITIES;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return INITIAL_ACTIVITIES;
   });
 
   const [weather, setWeather] = useState<WeatherData>(() => {
@@ -480,7 +493,13 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}expenses`);
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return INITIAL_EXPENSES;
   });
 
   const [readReminderIds, setReadReminderIds] = useState<string[]>(() => {
@@ -491,13 +510,25 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Products / Harvest Listings State
   const [products, setProducts] = useState<ProductListing[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}products`);
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return INITIAL_PRODUCTS;
   });
 
   // Orders State
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}orders`);
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return INITIAL_ORDERS;
   });
 
   // Shopping Cart State
@@ -1648,6 +1679,22 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setProducts(INITIAL_PRODUCTS);
     setOrders(INITIAL_ORDERS);
     setCart([]);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}user`, JSON.stringify(INITIAL_USER));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}registered_accounts`, JSON.stringify(DEFAULT_REGISTERED_ACCOUNTS));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}auth_status`, JSON.stringify(true));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}farms`, JSON.stringify(INITIAL_FARMS));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}crops`, JSON.stringify(INITIAL_CROPS));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}activities`, JSON.stringify(INITIAL_ACTIVITIES));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}weather`, JSON.stringify(INITIAL_WEATHER));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}expenses`, JSON.stringify(INITIAL_EXPENSES));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}read_reminders`, JSON.stringify([]));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}products`, JSON.stringify(INITIAL_PRODUCTS));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}orders`, JSON.stringify(INITIAL_ORDERS));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}cart`, JSON.stringify([]));
+    } catch {
+      // benign
+    }
     showToast('App data reset to default demo dataset.');
   };
 

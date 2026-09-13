@@ -73,6 +73,17 @@ app.use('/api/weather', weatherRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/scanner', scannerRoutes);
 
+// Endpoint to restore/seed all mock data on demand
+const { seedDatabase } = require('./seedMockData');
+app.post('/api/seed', async (req, res) => {
+  try {
+    await seedDatabase();
+    res.json({ success: true, message: 'All mocked data has been restored to MongoDB.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Optional: Serve frontend static build if present in dist
 const distPath = path.resolve(__dirname, '..', 'dist');
 app.use(express.static(distPath));

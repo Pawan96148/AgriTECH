@@ -119,7 +119,7 @@ export const WeatherView: React.FC = () => {
           <button
             onClick={handleDetectGPS}
             disabled={gpsRequesting}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-lime-50 text-emerald-900 border border-lime-300 shadow-2xs transition cursor-pointer disabled:opacity-50"
+            className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-lime-50 text-emerald-900 border border-lime-300 shadow-2xs transition active:scale-95 cursor-pointer disabled:opacity-50"
             title="Detect precise GPS location from your browser"
           >
             <Navigation className={`w-3.5 h-3.5 text-emerald-700 ${gpsRequesting ? 'animate-spin' : ''}`} />
@@ -130,7 +130,7 @@ export const WeatherView: React.FC = () => {
           <button
             onClick={refreshWeather}
             disabled={weatherLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-lime-50 text-emerald-900 border border-lime-300 shadow-2xs transition cursor-pointer disabled:opacity-50"
+            className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-lime-50 text-emerald-900 border border-lime-300 shadow-2xs transition active:scale-95 cursor-pointer disabled:opacity-50"
             title="Refresh latest OpenWeatherMap conditions"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-emerald-700 ${weatherLoading ? 'animate-spin' : ''}`} />
@@ -138,7 +138,7 @@ export const WeatherView: React.FC = () => {
           </button>
 
           {/* Farm Location Switcher */}
-          <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-lime-200 shadow-2xs w-full sm:w-auto">
+          <div className="min-h-[38px] flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-lime-200 shadow-2xs w-full sm:w-auto">
             <MapPin className="w-3.5 h-3.5 text-emerald-700 ml-1.5 shrink-0" />
             <select
               id="weather-farm-select"
@@ -190,7 +190,7 @@ export const WeatherView: React.FC = () => {
             <button
               key={preset}
               onClick={() => handleScenarioChange(preset)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+              className={`min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer ${
                 activePreset === preset
                   ? 'bg-emerald-800 text-white shadow-xs'
                   : 'bg-white hover:bg-lime-50 text-emerald-950 border border-lime-300'
@@ -322,7 +322,7 @@ export const WeatherView: React.FC = () => {
             <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2.5">
               Hourly Rain Probability & Temperature
             </h3>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 min-[440px]:grid-cols-3 sm:grid-cols-6 gap-2">
               {weather.hourly.map((h, i) => (
                 <div key={i} className="bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-center text-xs space-y-1">
                   <span className="text-[11px] font-semibold text-stone-500 block">{h.time}</span>

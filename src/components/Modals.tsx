@@ -217,16 +217,17 @@ export const Modals: React.FC = () => {
     <>
       {/* -------------------- ADD FARM MODAL -------------------- */}
       {isAddFarmModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-800" />
+                <MapPin className="w-5 h-5 text-emerald-800 shrink-0" />
                 <h3 className="text-base font-bold text-emerald-950">Register New Farm Plot</h3>
               </div>
               <button
                 onClick={() => setIsAddFarmModalOpen(false)}
-                className="text-stone-400 hover:text-stone-700 text-lg font-bold cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-base font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close Add Farm Modal"
               >
                 ✕
               </button>
@@ -359,16 +360,17 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- ADD CROP MODAL -------------------- */}
       {isAddCropModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
-                <Wheat className="w-5 h-5 text-emerald-800" />
+                <Wheat className="w-5 h-5 text-emerald-800 shrink-0" />
                 <h3 className="text-base font-bold text-emerald-950">Plant New Crop Cycle</h3>
               </div>
               <button
                 onClick={() => setIsAddCropModalOpen(false)}
-                className="text-stone-400 hover:text-stone-700 text-lg font-bold cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-base font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close Add Crop Modal"
               >
                 ✕
               </button>
@@ -514,16 +516,17 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- ADD ACTIVITY MODAL -------------------- */}
       {isAddActivityModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-100 pb-3">
               <div className="flex items-center gap-2">
-                <CalendarCheck className="w-5 h-5 text-emerald-800" />
+                <CalendarCheck className="w-5 h-5 text-emerald-800 shrink-0" />
                 <h3 className="text-base font-bold text-emerald-950">Schedule Field Operation</h3>
               </div>
               <button
                 onClick={() => setIsAddActivityModalOpen(false)}
-                className="text-stone-400 hover:text-stone-700 text-lg font-bold cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-base font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close Add Activity Modal"
               >
                 ✕
               </button>
@@ -619,7 +622,7 @@ export const Modals: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Scheduled Date *</label>
                   <input
@@ -686,11 +689,11 @@ export const Modals: React.FC = () => {
 
       {/* -------------------- EXPORT SUMMARY REPORT MODAL -------------------- */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 space-y-5 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full p-4 sm:p-6 space-y-5 shadow-2xl border border-lime-200 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-lime-200 pb-3">
               <div className="flex items-center gap-2">
-                <FileSpreadsheet className="w-5 h-5 text-emerald-800" />
+                <FileSpreadsheet className="w-5 h-5 text-emerald-800 shrink-0" />
                 <div>
                   <h3 className="text-base font-bold text-emerald-950">AGRITECH Farm Seasonal Summary Report</h3>
                   <p className="text-xs text-stone-500">Official log for bank financing, co-op audits, and advisory reviews</p>
@@ -698,7 +701,8 @@ export const Modals: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsExportModalOpen(false)}
-                className="text-stone-400 hover:text-stone-700 text-lg font-bold cursor-pointer"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition cursor-pointer text-base font-bold active:scale-95 -mr-1 shrink-0"
+                aria-label="Close Export Modal"
               >
                 ✕
               </button>
@@ -719,62 +723,66 @@ export const Modals: React.FC = () => {
             {/* Section 1: Plots */}
             <div className="space-y-2 text-xs">
               <h4 className="font-bold text-emerald-950 uppercase tracking-wider">1. Registered Land Parcels</h4>
-              <table className="w-full text-left border border-stone-200 rounded-lg overflow-hidden">
-                <thead className="bg-stone-100 font-bold text-stone-700">
-                  <tr>
-                    <th className="p-2">Farm Name</th>
-                    <th className="p-2">Location</th>
-                    <th className="p-2">Area</th>
-                    <th className="p-2">Soil Type</th>
-                    <th className="p-2">Irrigation</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {farms.map(f => (
-                    <tr key={f.id} className="hover:bg-stone-50">
-                      <td className="p-2 font-semibold text-stone-900">{f.farmName}</td>
-                      <td className="p-2">{f.location}</td>
-                      <td className="p-2 font-mono">{f.area} Ac</td>
-                      <td className="p-2">{f.soilType}</td>
-                      <td className="p-2">{f.irrigationType}</td>
+              <div className="overflow-x-auto -mx-1 sm:mx-0">
+                <table className="w-full min-w-[480px] text-left border border-stone-200 rounded-lg overflow-hidden">
+                  <thead className="bg-stone-100 font-bold text-stone-700">
+                    <tr>
+                      <th className="p-2">Farm Name</th>
+                      <th className="p-2">Location</th>
+                      <th className="p-2">Area</th>
+                      <th className="p-2">Soil Type</th>
+                      <th className="p-2">Irrigation</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {farms.map(f => (
+                      <tr key={f.id} className="hover:bg-stone-50">
+                        <td className="p-2 font-semibold text-stone-900">{f.farmName}</td>
+                        <td className="p-2">{f.location}</td>
+                        <td className="p-2 font-mono">{f.area} Ac</td>
+                        <td className="p-2">{f.soilType}</td>
+                        <td className="p-2">{f.irrigationType}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Section 2: Crops */}
             <div className="space-y-2 text-xs">
               <h4 className="font-bold text-emerald-950 uppercase tracking-wider">2. Crop Lifecycle Status</h4>
-              <table className="w-full text-left border border-stone-200 rounded-lg overflow-hidden">
-                <thead className="bg-stone-100 font-bold text-stone-700">
-                  <tr>
-                    <th className="p-2">Crop Name</th>
-                    <th className="p-2">Sown</th>
-                    <th className="p-2">Harvest Target</th>
-                    <th className="p-2">Stage</th>
-                    <th className="p-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {crops.map(c => (
-                    <tr key={c.id} className="hover:bg-stone-50">
-                      <td className="p-2 font-semibold text-stone-900">{c.cropName}</td>
-                      <td className="p-2">{c.plantingDate}</td>
-                      <td className="p-2">{c.expectedHarvestDate}</td>
-                      <td className="p-2 font-semibold text-emerald-800">{c.stage}</td>
-                      <td className="p-2 font-mono">{c.status}</td>
+              <div className="overflow-x-auto -mx-1 sm:mx-0">
+                <table className="w-full min-w-[480px] text-left border border-stone-200 rounded-lg overflow-hidden">
+                  <thead className="bg-stone-100 font-bold text-stone-700">
+                    <tr>
+                      <th className="p-2">Crop Name</th>
+                      <th className="p-2">Sown</th>
+                      <th className="p-2">Harvest Target</th>
+                      <th className="p-2">Stage</th>
+                      <th className="p-2">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {crops.map(c => (
+                      <tr key={c.id} className="hover:bg-stone-50">
+                        <td className="p-2 font-semibold text-stone-900">{c.cropName}</td>
+                        <td className="p-2">{c.plantingDate}</td>
+                        <td className="p-2">{c.expectedHarvestDate}</td>
+                        <td className="p-2 font-semibold text-emerald-800">{c.stage}</td>
+                        <td className="p-2 font-mono">{c.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-100">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-stone-100">
               <button
                 onClick={handleDownloadCSV}
-                className="flex items-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-bold px-4 py-2 rounded-xl border border-lime-300 text-xs shadow-xs cursor-pointer"
+                className="w-full sm:w-auto min-h-[42px] flex items-center justify-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-bold px-4 py-2 rounded-xl border border-lime-300 text-xs shadow-xs cursor-pointer active:scale-98"
               >
                 <Download className="w-4 h-4 text-emerald-700" />
                 <span>Download CSV Data</span>
@@ -783,7 +791,7 @@ export const Modals: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs cursor-pointer"
+                  className="w-full sm:w-auto min-h-[42px] flex items-center justify-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs cursor-pointer active:scale-98"
                 >
                   <Printer className="w-4 h-4 text-lime-400" />
                   <span>Print PDF Summary</span>

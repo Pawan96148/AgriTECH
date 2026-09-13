@@ -97,40 +97,40 @@ export const CropsView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
           <button
             id="open-qr-scanner-btn"
             onClick={() => setIsQRScannerOpen(true)}
-            className="flex items-center justify-center gap-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold px-3.5 py-2.5 rounded-xl border border-lime-500 shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
+            className="min-h-[42px] flex items-center justify-center gap-2 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold px-3 py-2 rounded-xl border border-lime-500 shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
           >
-            <QrCode className="w-4 h-4 text-emerald-950" />
-            <span>Scan Seed / Machine QR</span>
+            <QrCode className="w-4 h-4 text-emerald-950 shrink-0" />
+            <span className="truncate">Scan QR</span>
           </button>
 
           <button
             id="open-crop-guide-btn"
             onClick={() => setActiveTab('knowledge')}
-            className="flex items-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-semibold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer"
+            className="min-h-[42px] flex items-center justify-center gap-1.5 bg-white hover:bg-lime-50 text-emerald-900 font-semibold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer active:scale-95"
           >
-            <span>Crop Encyclopedia</span>
+            <span className="truncate">Encyclopedia</span>
           </button>
 
           <button
             id="sell-harvest-btn"
             onClick={() => setActiveTab('sell-produce')}
-            className="flex items-center gap-1.5 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer"
+            className="min-h-[42px] flex items-center justify-center gap-1.5 bg-lime-100 hover:bg-lime-200 text-emerald-950 font-bold px-3 py-2 rounded-xl border border-lime-300 shadow-xs transition text-xs cursor-pointer active:scale-95"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-800" />
-            <span>Sell Produce</span>
+            <Sparkles className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
+            <span className="truncate">Sell Produce</span>
           </button>
           
           <button
             id="add-new-crop-btn"
             onClick={() => setIsAddCropModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
+            className="min-h-[42px] flex items-center justify-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3.5 py-2 rounded-xl shadow-xs transition active:scale-95 text-xs sm:text-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-lime-400 stroke-[3]" />
-            <span>Plant New Crop</span>
+            <Plus className="w-4 h-4 text-lime-400 stroke-[3] shrink-0" />
+            <span className="truncate">Plant Crop</span>
           </button>
         </div>
       </div>

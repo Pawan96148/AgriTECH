@@ -149,12 +149,12 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAF7] text-[#212529] flex flex-col font-sans selection:bg-lime-200 selection:text-emerald-950">
+    <div className="min-h-screen bg-[#F8FAF7] text-[#212529] flex flex-col font-sans selection:bg-lime-200 selection:text-emerald-950 overflow-x-hidden">
       {/* Toast Notification Popup */}
       {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-5 right-4 left-4 sm:left-auto sm:right-5 z-50 animate-bounce duration-300 bg-emerald-950 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-lime-400/50 flex items-center gap-2">
+        <div className="fixed bottom-24 sm:bottom-6 right-4 left-4 sm:left-auto sm:right-6 z-50 animate-bounce duration-300 bg-emerald-950 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-lime-400/50 flex items-center gap-2 max-w-md mx-auto sm:mx-0">
           <CheckCircle2 className="w-4 h-4 text-lime-400 shrink-0" />
-          <span>{toastMessage}</span>
+          <span className="truncate">{toastMessage}</span>
         </div>
       )}
 
@@ -162,7 +162,7 @@ const MainContent: React.FC = () => {
       <Navbar />
 
       {/* Main Tab Screen */}
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="flex-1 pb-24 md:pb-0 min-w-0">
         {renderActiveView()}
       </main>
 

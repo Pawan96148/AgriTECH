@@ -167,24 +167,24 @@ export const CheckoutModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-none sm:rounded-3xl max-w-2xl w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] overflow-hidden shadow-2xl border-0 sm:border sm:border-lime-300 relative my-auto animate-in fade-in zoom-in-95 duration-150 flex flex-col">
         
         {/* Header with Security Badge */}
-        <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-green-950 text-white p-4 sm:p-6 relative shrink-0">
+        <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-green-950 text-white p-4 sm:p-6 relative shrink-0 pt-safe">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-lime-400/20 text-lime-300 border border-lime-400/40 flex items-center justify-center">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-lime-400/20 text-lime-300 border border-lime-400/40 flex items-center justify-center shrink-0">
                 <ShoppingBag className="w-5 h-5 text-lime-400" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   <h3 className="text-base font-bold text-white font-serif">Direct Farmer Checkout</h3>
-                  <span className="text-[10px] bg-lime-400 text-emerald-950 font-bold px-2 py-0.2 rounded-full uppercase tracking-wider">
+                  <span className="text-[9px] sm:text-[10px] bg-lime-400 text-emerald-950 font-bold px-2 py-0.2 rounded-full uppercase tracking-wider whitespace-nowrap">
                     Jharkhand Scope
                   </span>
                 </div>
-                <p className="text-xs text-emerald-200">Doorstep delivery straight from local harvest plots</p>
+                <p className="text-[11px] sm:text-xs text-emerald-200 truncate">Doorstep delivery straight from local harvest plots</p>
               </div>
             </div>
 
@@ -193,16 +193,17 @@ export const CheckoutModal: React.FC = () => {
                 setIsCheckoutModalOpen(false);
                 setCheckoutDirectProduct(null);
               }}
-              className="w-8 h-8 rounded-full bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 flex items-center justify-center transition cursor-pointer text-sm font-bold"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 flex items-center justify-center transition cursor-pointer text-sm font-bold active:scale-95 shrink-0 ml-2"
+              aria-label="Close Checkout Modal"
             >
               ✕
             </button>
           </div>
 
           {/* Sandbox Demo Notice Banner - Requirement 4 */}
-          <div className="mt-4 bg-lime-400/15 border border-lime-300/30 rounded-xl p-2.5 flex items-center gap-2 text-xs text-lime-200">
+          <div className="mt-3 sm:mt-4 bg-lime-400/15 border border-lime-300/30 rounded-xl p-2.5 flex items-center gap-2 text-xs text-lime-200">
             <Info className="w-4 h-4 text-lime-300 shrink-0" />
-            <span>
+            <span className="text-[11px] sm:text-xs leading-relaxed">
               <strong>Demo / Sandbox Payment Mode:</strong> Transactions simulate real gateway verification without debiting real bank funds. Ready for Razorpay gateway integration.
             </span>
           </div>
@@ -566,15 +567,15 @@ export const CheckoutModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Button */}
-          <div className="pt-2 border-t border-stone-200 flex items-center justify-between gap-3">
+          {/* Action Button - Responsive Mobile Stacking & Safe Area */}
+          <div className="pt-3 border-t border-stone-200 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 shrink-0 bg-white sticky bottom-0 pb-safe">
             <button
               type="button"
               onClick={() => {
                 setIsCheckoutModalOpen(false);
                 setCheckoutDirectProduct(null);
               }}
-              className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-xl cursor-pointer"
+              className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-xl cursor-pointer text-xs transition active:scale-98 flex items-center justify-center"
             >
               Back to Marketplace
             </button>
@@ -582,7 +583,7 @@ export const CheckoutModal: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || itemsToOrder.length === 0}
-              className="px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto min-h-[46px] px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs sm:text-sm active:scale-98"
             >
               <span>{isSubmitting ? 'Confirming Direct Dispatch...' : `Authorize & Pay ₹${totalAmount}`}</span>
               <ArrowRight className="w-4 h-4 text-lime-300" />
